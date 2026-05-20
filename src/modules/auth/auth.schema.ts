@@ -11,5 +11,11 @@ export const loginSchema = z.object({
   password: z.string().min(6),
 });
 
+export const updatePasswordSchema = z.object({
+  currentPassword: z.string().min(6),
+  newPassword: z.string().min(6),
+});
+
+export type updatePasswordDto = z.infer<typeof updatePasswordSchema>;
 export type LoginDto = z.infer<typeof loginSchema>;
 export type RegisterDto = z.infer<typeof registerSchema>;

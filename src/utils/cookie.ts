@@ -1,5 +1,4 @@
 import type { Response } from "express";
-import { env } from "../config/env.js";
 
 export const setCookieHeaderAndSendResponse = (
   res: Response,
@@ -7,14 +6,18 @@ export const setCookieHeaderAndSendResponse = (
   token: string,
 ) => {
   res.cookie("jwt", token, {
-    httpOnly: env.NODE_ENV === "production",
-    // secure: true,
-    // sameSite: "lax",
-    sameSite: "none",
-    secure: true,
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
   });
 
   res.status(statusCode).json({
     status: "success",
   });
 };
+
+// res.cookie("jwt", token, {
+//   httpOnly: true,
+//   secure: true,
+//   sameSite: "none",
+// });

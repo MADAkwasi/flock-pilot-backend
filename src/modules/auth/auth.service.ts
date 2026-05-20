@@ -1,10 +1,16 @@
 import jwt from "jsonwebtoken";
-import type { LoginDto, RegisterDto } from "./auth.schema.js";
+import type {
+  LoginDto,
+  RegisterDto,
+  updatePasswordDto,
+} from "./auth.schema.js";
 import bcrypt from "bcrypt";
 import { prisma } from "../../db/prisma.js";
 import { env } from "../../config/env.js";
+import type { SafeUser } from "../../types/user.type.js";
+import { safeUserSelect } from "../../constants/user.constant.js";
 
-class UserService {
+class AuthService {
   public async registerUser(userData: RegisterDto): Promise<string> {
     const { name, email, password } = userData;
 
@@ -39,9 +45,49 @@ class UserService {
     return token;
   }
 
+  public async updateUserPassword(
+    id: string,
+    userData: updatePasswordDto,
+  ): Promise<string | null> {
+    const { currentPassword, newPassword } = userData;
+
+    const user = await prisma.user.findUnique({ where: { id } });
+
+    if (!user) return null;
+
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+
+    if (!isCurrentPasswordValid) return null;
+
+    const hashPassword = await bcrypt.hash(newPassword, 12);
+
+    await prisma.user.update({
+      where: { id },
+      data: {
+        password: hashPassword,
+      },
+    });
+
+    return this.signToken(user.id);
+  }
+
+  public async getUser(id: string): Promise<SafeUser | null> {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: safeUserSelect,
+    });
+
+    if (!user) return null;
+
+    return user;
+  }
+
   private signToken(id: string): string {
     return jwt.sign({ id }, env.JWT_SECRET);
   }
 }
 
-export const userService = new UserService();
+export const authService = new AuthService();

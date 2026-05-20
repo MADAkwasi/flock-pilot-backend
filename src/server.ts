@@ -6,6 +6,7 @@ import express, {
   type Request,
   type NextFunction,
 } from "express";
+import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { env } from "./config/env.js";
 import { globalErrorHandler } from "./utils/errorController.js";
@@ -13,8 +14,10 @@ import AppError from "./utils/appError.js";
 
 const app: Express = express();
 
+if (env.NODE_ENV === "development") app.use(morgan("dev"));
+
 app.use(express.json());
-app.use(morgan("dev"));
+app.use(cookieParser());
 
 const { PORT } = env;
 
