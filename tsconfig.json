@@ -9,7 +9,9 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
-    "types": [],
+    "moduleResolution": "nodenext",
+    "types": ["node", "express"],
+    "lib": ["esnext"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -22,7 +24,7 @@
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
 
     // Style Options
     // "noImplicitReturns": true,
@@ -34,7 +36,6 @@
 
     // Recommended Options
     "strict": true,
-    "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
