@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole{
+  FARMER
+  ADMIN
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AiRole {
+  USER
+  ASSISTANT
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  password String 
+  name String
+  role UserRole @default(FARMER)
+  farms Farm[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Farm {
+  id String @id @default(uuid())
+  name String
+  location String?
+  description String?
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id])
+  flocks Flock[]
+  aiLogs AiInteraction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Flock{
+  id String @id @default(uuid())
+  name String
+  breed String?
+  quantity Int
+  farmId String
+  farm Farm @relation(fields: [farmId], references: [id])
+  feed FeedLog[]
+  health HealthRecord[]
+  eggs EggProduction[]
+  mortality MortalityRecord[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FeedLog{
+  id String @id @default(uuid())
+  flockId String
+  flock Flock @relation(fields: [flockId], references: [id])
+  feedType String
+  quantityKg Float?
+  cost Float?
+  notes String?
+  fedAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model HealthRecord{
+  id String @id @default(uuid())
+  flockId String
+  flock Flock @relation(fields: [flockId], references: [id])
+  condition String
+  severity Severity
+  treatment String?
+  medication String
+  vetNotes String?
+  recordedAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model EggProduction {
+  id String @id @default(uuid())
+  flockId String
+  flock Flock @relation(fields: [flockId], references: [id])
+  count Int
+  broken Int @default(0)
+  recordedAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model MortalityRecord {
+  id String @id @default(uuid())
+  flockId String
+  flock Flock @relation(fields: [flockId], references: [id])
+  count Int
+  cause String?
+  recordedAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model AiInteraction {
+  id String @id @default(ulid())
+  farmId String
+  farm Farm @relation(fields: [farmId], references: [id])
+  role AiRole
+  message String
+  metadata Json?
+  createdAt DateTime @default(now())
+}
+
