@@ -11,6 +11,8 @@ import {
 } from "./farm.scheme.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { FarmController } from "./farm.controller.js";
+import { createFlockSchema } from "../flock/flock.schema.js";
+import { FlockController } from "../flock/flock.controller.js";
 
 const router: Router = Router();
 
@@ -32,6 +34,14 @@ router
     validateParams(updateFarmParamsSchema),
     validateBody(updateFarmBodySchema),
     catchAsync(FarmController.updateFarm),
+  );
+
+router
+  .route("/:farmId/flocks")
+  .post(
+    validateBody(createFlockSchema),
+    validateParams(updateFarmParamsSchema),
+    catchAsync(FlockController.createFlock),
   );
 
 router
