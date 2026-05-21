@@ -21,7 +21,7 @@ class FarmService {
 
   public async getUserFarms(ownerId: string): Promise<Farm[]> {
     const farms = await prisma.farm.findMany({
-      where: { ownerId },
+      where: { ownerId, isActive: true },
     });
 
     return farms;
@@ -47,7 +47,7 @@ class FarmService {
     updateData: UpdateFarmDto,
   ): Promise<FarmWithDetailSelect | null> {
     const farm = await prisma.farm.findFirst({
-      where: { id, ownerId },
+      where: { id, ownerId, isActive: true },
     });
 
     if (!farm) return null;
@@ -56,6 +56,35 @@ class FarmService {
       where: { id },
       data: updateData,
       select: farmDetailSelect,
+    });
+  }
+
+  public async deactivateFarm(
+    id: string,
+    ownerId: string,
+  ): Promise<Farm | null> {
+    return this.setFarmStatus(id, ownerId, false);
+  }
+
+  public async activateFarm(id: string, ownerId: string): Promise<Farm | null> {
+    return this.setFarmStatus(id, ownerId, true);
+  }
+
+  private async setFarmStatus(
+    id: string,
+    ownerId: string,
+    isActive: boolean,
+  ): Promise<Farm | null> {
+    const farm = await prisma.farm.findFirst({
+      where: { id, ownerId },
+      select: { id: true },
+    });
+
+    if (!farm) return null;
+
+    return prisma.farm.update({
+      where: { id },
+      data: { isActive },
     });
   }
 }

@@ -70,4 +70,43 @@ export class FarmController {
       },
     });
   }
+
+  static async deactivate(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { farmId } = updateFarmParamsSchema.parse(req.params);
+    const { userId } = req;
+
+    const farm = await farmService.deactivateFarm(farmId, userId);
+
+    if (!farm) return next(new AppError("Farm not found", 404));
+
+    res.status(200).json({
+      status: "success",
+      message: "Farm deleted successfully",
+    });
+  }
+
+  static async activate(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { farmId } = updateFarmParamsSchema.parse(req.params);
+    const { userId } = req;
+
+    const farm = await farmService.activateFarm(farmId, userId);
+
+    if (!farm) return next(new AppError("Farm not found", 404));
+
+    res.status(200).json({
+      status: "success",
+      message: "Farm activated successfully",
+      data: {
+        farm,
+      },
+    });
+  }
 }

@@ -34,4 +34,18 @@ router
     catchAsync(FarmController.updateFarm),
   );
 
+router
+  .route("/:farmId/deactivate")
+  .patch(
+    validateParams(updateFarmParamsSchema),
+    catchAsync(FarmController.deactivate),
+  );
+
+router
+  .route("/:farmId/activate")
+  .patch(
+    validateParams(updateFarmParamsSchema),
+    catchAsync(FarmController.activate),
+  );
+
 export default router;
