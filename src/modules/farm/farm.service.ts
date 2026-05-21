@@ -87,6 +87,59 @@ class FarmService {
       data: { isActive },
     });
   }
+
+  public async getFarmDashboard(farmId: string, ownerId: string) {
+    const farm = await prisma.farm.findFirst({
+      where: {
+        id: farmId,
+        ownerId,
+        isActive: true,
+      },
+      select: { id: true },
+    });
+
+    if (!farm) return null;
+
+    const flockStats = await prisma.flock.aggregate({
+      where: { farmId },
+      _count: { id: true },
+      _sum: {
+        initialCount: true,
+        currentCount: true,
+      },
+    });
+
+    const mortalityStats = await prisma.mortalityRecord.aggregate({
+      where: {
+        flock: { farmId },
+      },
+      _sum: {
+        count: true,
+      },
+    });
+
+    const eggStats = await prisma.eggProduction.aggregate({
+      where: {
+        flock: { farmId },
+      },
+      _sum: {
+        count: true,
+      },
+    });
+
+    return {
+      farmId,
+      totalFlocks: flockStats._count.id,
+      totalInitialBirds: flockStats._sum.initialCount ?? 0,
+      totalCurrentBirds: flockStats._sum.currentCount ?? 0,
+      totalMortality: mortalityStats._sum.count ?? 0,
+      totalEggs: eggStats._sum.count ?? 0,
+      mortalityRate: flockStats._sum.initialCount
+        ? ((mortalityStats._sum.count ?? 0) / flockStats._sum.initialCount) *
+          100
+        : 0,
+    };
+  }
 }
 
 export const farmService = new FarmService();

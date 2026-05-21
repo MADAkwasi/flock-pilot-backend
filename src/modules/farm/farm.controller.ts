@@ -109,4 +109,26 @@ export class FarmController {
       },
     });
   }
+
+  static async getFarmDashboard(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { farmId } = updateFarmParamsSchema.parse(req.params);
+    const { userId } = req;
+
+    const dashboard = await farmService.getFarmDashboard(farmId, userId);
+
+    if (!dashboard) {
+      return next(new AppError("Farm not found", 404));
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        dashboard,
+      },
+    });
+  }
 }

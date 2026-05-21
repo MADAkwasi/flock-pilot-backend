@@ -36,6 +36,12 @@ router
     catchAsync(FarmController.updateFarm),
   );
 
+router.get(
+  "/:farmId/dashboard",
+  validateParams(updateFarmParamsSchema),
+  catchAsync(FarmController.getFarmDashboard),
+);
+
 router
   .route("/:farmId/flocks")
   .post(
