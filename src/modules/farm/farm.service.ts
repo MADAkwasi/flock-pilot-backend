@@ -27,7 +27,7 @@ class FarmService {
     return farms;
   }
 
-  public async getFarmById(
+  public async getFarmUserById(
     id: string,
     ownerId: string,
   ): Promise<FarmWithDetailSelect | null> {

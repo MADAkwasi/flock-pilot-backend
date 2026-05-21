@@ -15,9 +15,11 @@ export const farmDetailSelect = {
       id: true,
       name: true,
       breed: true,
-      quantity: true,
-      //   status: true,
+      flockType: true,
+      currentCount: true,
+      status: true,
       createdAt: true,
+      startDate: true,
     },
   },
 };

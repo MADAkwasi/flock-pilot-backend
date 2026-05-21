@@ -39,7 +39,7 @@ export class FarmController {
     const { farmId } = updateFarmParamsSchema.parse(req.params);
     const { userId } = req;
 
-    const farm = await farmService.getFarmById(farmId, userId);
+    const farm = await farmService.getFarmUserById(farmId, userId);
 
     if (!farm) return next(new AppError("Farm not found", 404));
 

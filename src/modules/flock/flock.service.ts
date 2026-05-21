@@ -18,6 +18,7 @@ class FlockService {
     return await prisma.flock.create({
       data: {
         farmId,
+        currentCount: flockData.initialCount,
         ...flockData,
       },
     });
