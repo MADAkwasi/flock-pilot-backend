@@ -23,7 +23,7 @@ app.use(cookieParser());
 const { PORT } = env;
 
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/farm", farmRouter);
+app.use("/api/v1/farms", farmRouter);
 
 app.all("/{*splat}", (req: Request, _: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

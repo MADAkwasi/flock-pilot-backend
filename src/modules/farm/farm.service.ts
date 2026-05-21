@@ -1,6 +1,8 @@
+import { farmDetailSelect } from "../../constants/farm.constant.js";
 import { prisma } from "../../db/prisma.js";
 import type { Farm } from "../../generated/prisma/client.js";
-import type { CreateFarmDto } from "./farm.scheme.js";
+import type { FarmWithDetailSelect } from "../../types/farm.type.js";
+import type { CreateFarmDto, UpdateFarmDto } from "./farm.scheme.js";
 
 class FarmService {
   public async createFarm(
@@ -23,6 +25,38 @@ class FarmService {
     });
 
     return farms;
+  }
+
+  public async getFarmById(
+    id: string,
+    ownerId: string,
+  ): Promise<FarmWithDetailSelect | null> {
+    const farm = await prisma.farm.findFirst({
+      where: { id, ownerId },
+      select: farmDetailSelect,
+    });
+
+    if (!farm) return null;
+
+    return farm;
+  }
+
+  public async updateFarmInfo(
+    id: string,
+    ownerId: string,
+    updateData: UpdateFarmDto,
+  ): Promise<FarmWithDetailSelect | null> {
+    const farm = await prisma.farm.findFirst({
+      where: { id, ownerId },
+    });
+
+    if (!farm) return null;
+
+    return prisma.farm.update({
+      where: { id },
+      data: updateData,
+      select: farmDetailSelect,
+    });
   }
 }
 

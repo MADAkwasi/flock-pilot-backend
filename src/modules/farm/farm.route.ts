@@ -1,7 +1,14 @@
 import { Router } from "express";
 import { protect } from "../../middleware/auth.middleware.js";
-import { validateBody } from "../../middleware/validator.middleware.js";
-import { createFarmSchema } from "./farm.scheme.js";
+import {
+  validateBody,
+  validateParams,
+} from "../../middleware/validator.middleware.js";
+import {
+  createFarmSchema,
+  updateFarmBodySchema,
+  updateFarmParamsSchema,
+} from "./farm.scheme.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { FarmController } from "./farm.controller.js";
 
@@ -14,5 +21,17 @@ router
   .post(validateBody(createFarmSchema), catchAsync(FarmController.createFarm));
 
 router.route("/my-farms").get(FarmController.getMyFarms);
+
+router
+  .route("/:farmId")
+  .get(
+    validateParams(updateFarmParamsSchema),
+    catchAsync(FarmController.getFarm),
+  )
+  .patch(
+    validateParams(updateFarmParamsSchema),
+    validateBody(updateFarmBodySchema),
+    catchAsync(FarmController.updateFarm),
+  );
 
 export default router;
