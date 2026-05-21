@@ -18,4 +18,18 @@ export class FarmController {
       },
     });
   }
+
+  static async getMyFarms(req: Request, res: Response): Promise<void> {
+    const { userId } = req;
+
+    const farms = await farmService.getUserFarms(userId);
+
+    res.status(200).json({
+      message: "success",
+      results: farms.length,
+      data: {
+        farms,
+      },
+    });
+  }
 }

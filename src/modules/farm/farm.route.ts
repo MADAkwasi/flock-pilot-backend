@@ -13,4 +13,6 @@ router
   .route("/")
   .post(validateBody(createFarmSchema), catchAsync(FarmController.createFarm));
 
+router.route("/my-farms").get(FarmController.getMyFarms);
+
 export default router;

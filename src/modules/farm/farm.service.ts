@@ -16,6 +16,14 @@ class FarmService {
 
     return newFarm;
   }
+
+  public async getUserFarms(ownerId: string): Promise<Farm[]> {
+    const farms = await prisma.farm.findMany({
+      where: { ownerId },
+    });
+
+    return farms;
+  }
 }
 
 export const farmService = new FarmService();
