@@ -11,8 +11,6 @@ import {
 } from "./farm.scheme.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { FarmController } from "./farm.controller.js";
-import { createFlockSchema } from "../flock/flock.schema.js";
-import { FlockController } from "../flock/flock.controller.js";
 
 const router: Router = Router();
 
@@ -22,7 +20,7 @@ router
   .route("/")
   .post(validateBody(createFarmSchema), catchAsync(FarmController.createFarm));
 
-router.route("/my-farms").get(FarmController.getMyFarms);
+router.route("/my-farms").get(catchAsync(FarmController.getMyFarms));
 
 router
   .route("/:farmId")
@@ -41,14 +39,6 @@ router.get(
   validateParams(updateFarmParamsSchema),
   catchAsync(FarmController.getFarmDashboard),
 );
-
-router
-  .route("/:farmId/flocks")
-  .post(
-    validateBody(createFlockSchema),
-    validateParams(updateFarmParamsSchema),
-    catchAsync(FlockController.createFlock),
-  );
 
 router
   .route("/:farmId/deactivate")

@@ -76,7 +76,7 @@ model Farm {
 
 model Flock{
   id String @id @default(uuid())
-  name String
+  name String @unique
   breed String?
   flockType FlockType
   currentCount Int 
