@@ -2,10 +2,15 @@ import type { NextFunction, Request, Response } from "express";
 import { authService } from "./auth.service.js";
 import { setCookieHeaderAndSendResponse } from "../../utils/cookie.js";
 import AppError from "../../utils/appError.js";
+import {
+  loginSchema,
+  registerSchema,
+  updatePasswordSchema,
+} from "./auth.schema.js";
 
 export class AuthController {
   static async signUpUser(req: Request, res: Response): Promise<void> {
-    const { name, password, email } = req.body;
+    const { name, password, email } = registerSchema.parse(req.body);
 
     const token = await authService.registerUser({ name, password, email });
 
@@ -17,7 +22,7 @@ export class AuthController {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
-    const { email, password } = req.body;
+    const { email, password } = loginSchema.parse(req.body);
 
     const token = await authService.loginUser({ email, password });
 
@@ -33,7 +38,10 @@ export class AuthController {
   ): Promise<void> {
     const { userId, body } = req;
 
-    const token = await authService.updateUserPassword(userId, body);
+    const token = await authService.updateUserPassword(
+      userId,
+      updatePasswordSchema.parse(body),
+    );
 
     if (!token) return next(new AppError("Incorrect password", 400));
 
