@@ -7,8 +7,8 @@ import type {
 import bcrypt from "bcrypt";
 import { prisma } from "../../db/prisma.js";
 import { env } from "../../config/env.js";
-import type { SafeUser } from "../../types/user.type.js";
-import { safeUserSelect } from "../../constants/user.constant.js";
+import type { SafeUserWithFarms } from "../../types/user.type.js";
+import { safeUserWithFarmSelect } from "../../constants/user.constant.js";
 
 class AuthService {
   public async registerUser(userData: RegisterDto): Promise<string> {
@@ -74,10 +74,10 @@ class AuthService {
     return this.signToken(user.id);
   }
 
-  public async getUser(id: string): Promise<SafeUser | null> {
+  public async getUser(id: string): Promise<SafeUserWithFarms | null> {
     const user = await prisma.user.findUnique({
       where: { id },
-      select: safeUserSelect,
+      select: safeUserWithFarmSelect,
     });
 
     if (!user) return null;

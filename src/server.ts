@@ -1,5 +1,4 @@
 import "dotenv/config";
-import authRouter from "./modules/auth/auth.route.js";
 import express, {
   type Express,
   type Response,
@@ -7,6 +6,8 @@ import express, {
   type NextFunction,
 } from "express";
 import cookieParser from "cookie-parser";
+import authRouter from "./modules/auth/auth.route.js";
+import farmRouter from "./modules/farm/farm.route.js";
 import morgan from "morgan";
 import { env } from "./config/env.js";
 import { globalErrorHandler } from "./utils/errorController.js";
@@ -22,6 +23,7 @@ app.use(cookieParser());
 const { PORT } = env;
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/farms", farmRouter);
 
 app.all("/{*splat}", (req: Request, _: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

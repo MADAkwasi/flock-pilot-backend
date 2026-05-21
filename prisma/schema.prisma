@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -29,6 +29,23 @@ enum AiRole {
   ASSISTANT
 }
 
+enum FarmType {
+  BROILER
+  LAYER
+  MIXED
+}
+
+enum FlockType {
+  BROILER
+  LAYER
+}
+
+enum FlockStatus {
+  ACTIVE
+  SOLD
+  ARCHIVED
+}
+
 model User {
   id String @id @default(uuid())
   email String @unique
@@ -47,25 +64,37 @@ model Farm {
   description String?
   ownerId String
   owner User @relation(fields: [ownerId], references: [id])
+  isActive Boolean @default(true)
+  farmType FarmType?
   flocks Flock[]
   aiLogs AiInteraction[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
 }
 
 model Flock{
   id String @id @default(uuid())
   name String
   breed String?
-  quantity Int
+  flockType FlockType
+  currentCount Int 
+  initialCount Int
+  source String?
+  notes String?
+  status FlockStatus @default(ACTIVE)
   farmId String
   farm Farm @relation(fields: [farmId], references: [id])
   feed FeedLog[]
   health HealthRecord[]
   eggs EggProduction[]
   mortality MortalityRecord[]
+  startDate DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([farmId])
 }
 
 model FeedLog{

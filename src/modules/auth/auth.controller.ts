@@ -50,7 +50,7 @@ export class AuthController {
     if (!user) return next(new AppError("User not found", 404));
 
     res.status(200).json({
-      message: "success",
+      status: "success",
       data: {
         user,
       },
