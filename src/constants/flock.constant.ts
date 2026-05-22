@@ -1,3 +1,6 @@
+import { feedLogListSelect } from "./feed-log.constant.js";
+import { healthListSelect } from "./health.constant.js";
+
 export const flockListSelect = {
   id: true,
   name: true,
@@ -41,24 +44,10 @@ export const flockDetailSelect = {
     },
   },
   health: {
-    select: {
-      id: true,
-      diagnosis: true,
-      severity: true,
-      treatment: true,
-      medication: true,
-      vetNotes: true,
-      recordedAt: true,
-    },
+    select: healthListSelect,
   },
   feed: {
-    select: {
-      id: true,
-      feedType: true,
-      quantityKg: true,
-      notes: true,
-      recordedAt: true,
-    },
+    select: feedLogListSelect,
   },
   notes: {
     select: {

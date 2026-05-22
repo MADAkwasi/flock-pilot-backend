@@ -16,4 +16,4 @@ export const feedLogDetailSelect = {
       flockType: true,
     },
   },
-};
+} as const;
