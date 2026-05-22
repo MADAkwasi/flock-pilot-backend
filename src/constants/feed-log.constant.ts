@@ -9,8 +9,11 @@ export const feedLogListSelect = {
 export const feedLogDetailSelect = {
   ...feedLogListSelect,
   flock: {
-    name: true,
-    breed: true,
-    flockType: true,
+    select: {
+      id: true,
+      name: true,
+      breed: true,
+      flockType: true,
+    },
   },
 };

@@ -2,8 +2,8 @@ import type {
   flockDetailSelect,
   flockListSelect,
   flockStatusSelect,
-} from "../constants/flock.constant.js";
-import type { Prisma } from "../generated/prisma/client.js";
+} from "../../constants/flock.constant.js";
+import type { Prisma } from "../../generated/prisma/client.js";
 
 export type FlockWithListSelect = Prisma.FlockGetPayload<{
   select: typeof flockListSelect;

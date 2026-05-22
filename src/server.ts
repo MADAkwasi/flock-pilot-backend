@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./modules/auth/auth.route.js";
 import farmRouter from "./modules/farm/farm.route.js";
 import flockRouter from "./modules/flock/flock.route.js";
-import feedLogRouter from "./modules/events/feed-logs/feed.route.js";
+import feedLogRouter from "./modules/events/feed-log/feed-log.route.js";
 import morgan from "morgan";
 import { env } from "./config/env.js";
 import { globalErrorHandler } from "./utils/errorController.js";

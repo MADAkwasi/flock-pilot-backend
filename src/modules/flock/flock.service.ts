@@ -8,7 +8,7 @@ import type {
   FlockWithDetailSelect,
   FlockWithListSelect,
   FlockWithStatusSelect,
-} from "../../types/flock.type.js";
+} from "./flock.type.js";
 import AppError from "../../utils/appError.js";
 import type {
   FlockDto,
@@ -127,7 +127,7 @@ class FlockService {
   }
 
   public async ensureOwnedFlock(flockId: string, ownerId: string) {
-    return prisma.flock.findFirst({
+    const flock = await prisma.flock.findFirst({
       where: {
         id: flockId,
         farm: {
@@ -136,8 +136,14 @@ class FlockService {
       },
       select: {
         id: true,
+        farmId: true,
+        currentCount: true,
       },
     });
+
+    if (!flock) throw new AppError("Flock not found", 404);
+
+    return flock;
   }
 }
 
