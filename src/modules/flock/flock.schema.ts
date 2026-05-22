@@ -8,7 +8,6 @@ export const createFlockSchema = z
     farmId: z.uuid(),
     initialCount: z.number(),
     source: z.string().min(3).optional(),
-    notes: z.string().min(5).optional(),
     startDate: z.coerce.date(),
   })
   .strict();

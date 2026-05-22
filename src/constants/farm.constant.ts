@@ -1,3 +1,5 @@
+import { flockListSelect } from "./flock.constant.js";
+
 export const farmActiveSelect = {
   isActive: true,
   updatedAt: true,
@@ -12,19 +14,20 @@ export const farmListSelect = {
 } as const;
 
 export const farmDetailSelect = {
+  ...farmListSelect,
   ownerId: true,
   description: true,
-  ...farmListSelect,
   flocks: {
+    select: flockListSelect,
+  },
+  expenses: {
     select: {
       id: true,
-      name: true,
-      breed: true,
-      flockType: true,
-      currentCount: true,
-      status: true,
-      createdAt: true,
-      startDate: true,
+      type: true,
+      category: true,
+      amount: true,
+      description: true,
+      occurredAt: true,
     },
   },
 };

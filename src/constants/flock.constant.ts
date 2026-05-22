@@ -17,15 +17,16 @@ export const flockStatusSelect = {
 export const flockDetailSelect = {
   ...flockListSelect,
   initialCount: true,
-  notes: true,
   farm: {
     select: {
+      id: true,
       name: true,
       location: true,
     },
   },
   mortality: {
     select: {
+      id: true,
       count: true,
       cause: true,
       recordedAt: true,
@@ -33,6 +34,7 @@ export const flockDetailSelect = {
   },
   eggs: {
     select: {
+      id: true,
       count: true,
       broken: true,
       recordedAt: true,
@@ -40,6 +42,7 @@ export const flockDetailSelect = {
   },
   health: {
     select: {
+      id: true,
       condition: true,
       severity: true,
       treatment: true,
@@ -50,11 +53,29 @@ export const flockDetailSelect = {
   },
   feed: {
     select: {
+      id: true,
       feedType: true,
       quantityKg: true,
       cost: true,
       notes: true,
-      fedAt: true,
+      recordedAt: true,
+    },
+  },
+  notes: {
+    select: {
+      id: true,
+      content: true,
+      recordedAt: true,
+    },
+  },
+  expenses: {
+    select: {
+      id: true,
+      type: true,
+      category: true,
+      amount: true,
+      description: true,
+      occurredAt: true,
     },
   },
 } as const;

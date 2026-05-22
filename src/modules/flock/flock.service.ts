@@ -121,19 +121,19 @@ class FlockService {
     });
   }
 
-  //   private async ensureOwnedFlock(flockId: string, ownerId: string) {
-  //     return prisma.flock.findFirst({
-  //       where: {
-  //         id: flockId,
-  //         farm: {
-  //           ownerId,
-  //         },
-  //       },
-  //       select: {
-  //         id: true,
-  //       },
-  //     });
-  //   }
+  public async ensureOwnedFlock(flockId: string, ownerId: string) {
+    return prisma.flock.findFirst({
+      where: {
+        id: flockId,
+        farm: {
+          ownerId,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+  }
 }
 
 export const flockService = new FlockService();

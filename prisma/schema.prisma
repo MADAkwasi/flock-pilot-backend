@@ -127,8 +127,7 @@ model Expense {
   occurredAt DateTime
   createdAt DateTime @default(now())
 
-  @@index([farmId])
-  @@index([flockId])
+  @@index([flockId, farmId])
 }
 
 model FeedLog{
