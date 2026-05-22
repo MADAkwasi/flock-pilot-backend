@@ -133,7 +133,7 @@ model Expense {
 model FeedLog{
   id String @id @default(uuid())
   flockId String
-  flock Flock @relation(fields: [flockId], references: [id])
+  flock Flock @relation(fields: [flockId], references: [id], onDelete: Cascade)
   feedType String
   quantityKg Float
   notes String?
@@ -145,13 +145,15 @@ model FeedLog{
 model HealthRecord{
   id String @id @default(uuid())
   flockId String
-  flock Flock @relation(fields: [flockId], references: [id])
+  flock Flock @relation(fields: [flockId], references: [id], onDelete: Cascade)
   diagnosis String
   severity Severity
   treatment String?
   medication String?
+  affectedCount Int?
   vetNotes String?
-  recordedAt DateTime @default(now())
+  recordedAt DateTime
+  createdAt DateTime @default(now())
 
   @@index([flockId, recordedAt])
 }
@@ -159,7 +161,7 @@ model HealthRecord{
 model EggProduction {
   id String @id @default(uuid())
   flockId String
-  flock Flock @relation(fields: [flockId], references: [id])
+  flock Flock @relation(fields: [flockId], references: [id], onDelete: Cascade)
   count Int
   broken Int @default(0)
   recordedAt DateTime @default(now())
@@ -170,7 +172,7 @@ model EggProduction {
 model MortalityRecord {
   id String @id @default(uuid())
   flockId String
-  flock Flock @relation(fields: [flockId], references: [id])
+  flock Flock @relation(fields: [flockId], references: [id], onDelete: Cascade)
   count Int
   cause String?
   notes String?
@@ -182,7 +184,7 @@ model MortalityRecord {
 model FlockNote{
   id String @id @default(uuid())
   flockId String
-  flock Flock @relation(fields: [flockId], references: [id])
+  flock Flock @relation(fields: [flockId], references: [id], onDelete: Cascade)
   content String
   recordedAt DateTime @default(now())
 
@@ -192,7 +194,7 @@ model FlockNote{
 model AiInteraction {
   id String @id @default(ulid())
   farmId String
-  farm Farm @relation(fields: [farmId], references: [id])
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
   role AiRole
   message String
   metadata Json?
