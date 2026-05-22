@@ -1,7 +1,6 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
 import { farmService } from "./farm.service.js";
-import AppError from "../../utils/appError.js";
-import { updateFarmParamsSchema } from "./farm.scheme.js";
+import { farmParamsSchema } from "./farm.scheme.js";
 
 export class FarmController {
   static async createFarm(req: Request, res: Response): Promise<void> {
@@ -31,18 +30,12 @@ export class FarmController {
     });
   }
 
-  static async getFarm(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    const { farmId } = updateFarmParamsSchema.parse(req.params);
+  static async getFarm(req: Request, res: Response): Promise<void> {
+    const { farmId } = farmParamsSchema.parse(req.params);
     const { userId } = req;
 
     const farm = await farmService.getFarmUserById(farmId, userId);
 
-    if (!farm) return next(new AppError("Farm not found", 404));
-
     res.status(200).json({
       status: "success",
       data: {
@@ -51,18 +44,12 @@ export class FarmController {
     });
   }
 
-  static async updateFarm(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    const { farmId } = updateFarmParamsSchema.parse(req.params);
+  static async updateFarm(req: Request, res: Response): Promise<void> {
+    const { farmId } = farmParamsSchema.parse(req.params);
     const { body, userId } = req;
 
     const farm = await farmService.updateFarmInfo(farmId, userId, body);
 
-    if (!farm) return next(new AppError("Farm not found", 404));
-
     res.status(200).json({
       status: "success",
       data: {
@@ -71,17 +58,11 @@ export class FarmController {
     });
   }
 
-  static async deactivate(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    const { farmId } = updateFarmParamsSchema.parse(req.params);
+  static async deactivate(req: Request, res: Response): Promise<void> {
+    const { farmId } = farmParamsSchema.parse(req.params);
     const { userId } = req;
 
-    const farm = await farmService.deactivateFarm(farmId, userId);
-
-    if (!farm) return next(new AppError("Farm not found", 404));
+    await farmService.deactivateFarm(farmId, userId);
 
     res.status(200).json({
       status: "success",
@@ -89,17 +70,11 @@ export class FarmController {
     });
   }
 
-  static async activate(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    const { farmId } = updateFarmParamsSchema.parse(req.params);
+  static async activate(req: Request, res: Response): Promise<void> {
+    const { farmId } = farmParamsSchema.parse(req.params);
     const { userId } = req;
 
     const farm = await farmService.activateFarm(farmId, userId);
-
-    if (!farm) return next(new AppError("Farm not found", 404));
 
     res.status(200).json({
       status: "success",
@@ -110,19 +85,11 @@ export class FarmController {
     });
   }
 
-  static async getFarmDashboard(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    const { farmId } = updateFarmParamsSchema.parse(req.params);
+  static async getFarmDashboard(req: Request, res: Response): Promise<void> {
+    const { farmId } = farmParamsSchema.parse(req.params);
     const { userId } = req;
 
     const dashboard = await farmService.getFarmDashboard(farmId, userId);
-
-    if (!dashboard) {
-      return next(new AppError("Farm not found", 404));
-    }
 
     res.status(200).json({
       status: "success",

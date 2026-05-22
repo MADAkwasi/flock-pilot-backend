@@ -7,20 +7,26 @@ import type { Flock } from "../../generated/prisma/client.js";
 import type {
   FlockWithDetailSelect,
   FlockWithListSelect,
+  FlockWithStatusSelect,
 } from "../../types/flock.type.js";
-import type { FlockDto } from "./flock.schema.js";
+import AppError from "../../utils/appError.js";
+import type {
+  FlockDto,
+  FlockStatusDto,
+  FlockUpdateDto,
+} from "./flock.schema.js";
 
 class FlockService {
   public async createFlock(
     ownerId: string,
     flockData: FlockDto,
-  ): Promise<Flock | null> {
+  ): Promise<Flock> {
     const farm = await prisma.farm.findFirst({
       where: { id: flockData.farmId, ownerId, isActive: true },
       select: { id: true },
     });
 
-    if (!farm) return null;
+    if (!farm) throw new AppError("Farm not found or unauthorized", 404);
 
     return await prisma.flock.create({
       data: {
@@ -33,28 +39,18 @@ class FlockService {
   public async getFarmFlocks(
     farmId: string,
     ownerId: string,
-  ): Promise<FlockWithListSelect[] | null> {
-    const farm = await prisma.farm.findFirst({
-      where: {
-        id: farmId,
-        ownerId,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (!farm) return null;
-
+  ): Promise<FlockWithListSelect[]> {
     const flocks = await prisma.flock.findMany({
       where: {
-        farmId,
         farm: {
+          id: farmId,
           ownerId,
         },
       },
       select: flockListSelect,
     });
+
+    if (!flocks) throw new AppError("Farm not found or unauthorized", 404);
 
     return flocks;
   }
@@ -62,16 +58,8 @@ class FlockService {
   public async getFlock(
     flockId: string,
     ownerId: string,
-  ): Promise<FlockWithDetailSelect | null> {
-    const flock = await this.getOwnedFlock(flockId, ownerId);
-
-    if (!flock) return null;
-
-    return flock;
-  }
-
-  private async getOwnedFlock(flockId: string, ownerId: string) {
-    return prisma.flock.findFirst({
+  ): Promise<FlockWithDetailSelect> {
+    const flock = await prisma.flock.findFirst({
       where: {
         id: flockId,
         farm: {
@@ -80,7 +68,72 @@ class FlockService {
       },
       select: flockDetailSelect,
     });
+
+    if (!flock) throw new AppError("Flock not found", 404);
+
+    return flock;
   }
+
+  public async updateFlockInfo(
+    flockId: string,
+    ownerId: string,
+    updateData: FlockUpdateDto,
+  ): Promise<FlockWithListSelect | null> {
+    const result = await prisma.flock.updateMany({
+      where: {
+        id: flockId,
+        farm: { ownerId },
+      },
+      data: updateData,
+    });
+
+    if (result.count === 0) throw new AppError("Flock not found", 404);
+
+    return prisma.flock.findFirst({
+      where: { id: flockId },
+      select: flockListSelect,
+    });
+  }
+
+  public async updateFlockStatus(
+    flockId: string,
+    ownerId: string,
+    status: FlockStatusDto,
+  ): Promise<FlockWithStatusSelect | null> {
+    const result = await prisma.flock.updateMany({
+      where: {
+        id: flockId,
+        farm: { ownerId },
+      },
+      data: status,
+    });
+
+    if (result.count === 0) throw new AppError("Flock not found", 404);
+
+    return prisma.flock.findUnique({
+      where: {
+        id: flockId,
+      },
+      select: {
+        status: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  //   private async ensureOwnedFlock(flockId: string, ownerId: string) {
+  //     return prisma.flock.findFirst({
+  //       where: {
+  //         id: flockId,
+  //         farm: {
+  //           ownerId,
+  //         },
+  //       },
+  //       select: {
+  //         id: true,
+  //       },
+  //     });
+  //   }
 }
 
 export const flockService = new FlockService();

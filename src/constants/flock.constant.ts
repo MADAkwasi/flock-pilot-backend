@@ -9,6 +9,11 @@ export const flockListSelect = {
   startDate: true,
 } as const;
 
+export const flockStatusSelect = {
+  status: true,
+  updatedAt: true,
+} as const;
+
 export const flockDetailSelect = {
   ...flockListSelect,
   initialCount: true,
