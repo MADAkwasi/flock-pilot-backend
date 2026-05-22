@@ -43,7 +43,7 @@ export const flockDetailSelect = {
   health: {
     select: {
       id: true,
-      condition: true,
+      diagnosis: true,
       severity: true,
       treatment: true,
       medication: true,
@@ -56,7 +56,6 @@ export const flockDetailSelect = {
       id: true,
       feedType: true,
       quantityKg: true,
-      cost: true,
       notes: true,
       recordedAt: true,
     },

@@ -18,8 +18,8 @@ class FarmService {
   ): Promise<Farm> {
     const newFarm = await prisma.farm.create({
       data: {
-        ownerId,
         ...farmData,
+        ownerId,
       },
     });
 
