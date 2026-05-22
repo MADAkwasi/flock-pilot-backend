@@ -1,3 +1,8 @@
+export const farmActiveSelect = {
+  isActive: true,
+  updatedAt: true,
+};
+
 export const farmListSelect = {
   id: true,
   name: true,

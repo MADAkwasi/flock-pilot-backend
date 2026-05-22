@@ -1,7 +1,14 @@
-import { farmDetailSelect } from "../../constants/farm.constant.js";
+import {
+  farmActiveSelect,
+  farmDetailSelect,
+} from "../../constants/farm.constant.js";
 import { prisma } from "../../db/prisma.js";
 import type { Farm } from "../../generated/prisma/client.js";
-import type { FarmWithDetailSelect } from "../../types/farm.type.js";
+import type {
+  FarmWithActiveSelect,
+  FarmWithDetailSelect,
+} from "../../types/farm.type.js";
+import AppError from "../../utils/appError.js";
 import type { CreateFarmDto, UpdateFarmDto } from "./farm.scheme.js";
 
 class FarmService {
@@ -36,7 +43,7 @@ class FarmService {
       select: farmDetailSelect,
     });
 
-    if (!farm) return null;
+    if (!farm) throw new AppError("Farm not Found", 404);
 
     return farm;
   }
@@ -46,15 +53,15 @@ class FarmService {
     ownerId: string,
     updateData: UpdateFarmDto,
   ): Promise<FarmWithDetailSelect | null> {
-    const farm = await prisma.farm.findFirst({
+    const result = await prisma.farm.updateMany({
       where: { id, ownerId, isActive: true },
+      data: updateData,
     });
 
-    if (!farm) return null;
+    if (result.count === 0) throw new AppError("Farm not found", 404);
 
-    return prisma.farm.update({
+    return prisma.farm.findUnique({
       where: { id },
-      data: updateData,
       select: farmDetailSelect,
     });
   }
@@ -62,11 +69,14 @@ class FarmService {
   public async deactivateFarm(
     id: string,
     ownerId: string,
-  ): Promise<Farm | null> {
+  ): Promise<FarmWithActiveSelect | null> {
     return this.setFarmStatus(id, ownerId, false);
   }
 
-  public async activateFarm(id: string, ownerId: string): Promise<Farm | null> {
+  public async activateFarm(
+    id: string,
+    ownerId: string,
+  ): Promise<FarmWithActiveSelect | null> {
     return this.setFarmStatus(id, ownerId, true);
   }
 
@@ -74,17 +84,17 @@ class FarmService {
     id: string,
     ownerId: string,
     isActive: boolean,
-  ): Promise<Farm | null> {
-    const farm = await prisma.farm.findFirst({
+  ): Promise<FarmWithActiveSelect | null> {
+    const result = await prisma.farm.updateMany({
       where: { id, ownerId },
-      select: { id: true },
+      data: { isActive },
     });
 
-    if (!farm) return null;
+    if (result.count === 0) throw new AppError("Farm not found", 404);
 
-    return prisma.farm.update({
+    return prisma.farm.findUnique({
       where: { id },
-      data: { isActive },
+      select: farmActiveSelect,
     });
   }
 
@@ -98,7 +108,7 @@ class FarmService {
       select: { id: true },
     });
 
-    if (!farm) return null;
+    if (!farm) throw new AppError("Farm not found", 404);
 
     const flockStats = await prisma.flock.aggregate({
       where: { farmId },

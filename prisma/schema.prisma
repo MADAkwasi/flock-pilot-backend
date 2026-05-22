@@ -46,6 +46,15 @@ enum FlockStatus {
   ARCHIVED
 }
 
+enum ExpenseType {
+  FEED
+  MEDICATION
+  INVENTORY
+  LABOR
+  TRANSPORT
+  OTHER
+}
+
 model User {
   id String @id @default(uuid())
   email String @unique
@@ -63,10 +72,11 @@ model Farm {
   location String?
   description String?
   ownerId String
-  owner User @relation(fields: [ownerId], references: [id])
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   isActive Boolean @default(true)
   farmType FarmType?
   flocks Flock[]
+  expenses Expense[]
   aiLogs AiInteraction[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,19 +86,20 @@ model Farm {
 
 model Flock{
   id String @id @default(uuid())
-  name String
+  name String @unique
   breed String?
   flockType FlockType
   currentCount Int 
   initialCount Int
   source String?
-  notes String?
   status FlockStatus @default(ACTIVE)
   farmId String
-  farm Farm @relation(fields: [farmId], references: [id])
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  notes FlockNote[]
   feed FeedLog[]
   health HealthRecord[]
   eggs EggProduction[]
+  expenses Expense[]
   mortality MortalityRecord[]
   startDate DateTime
   createdAt DateTime @default(now())
@@ -97,29 +108,53 @@ model Flock{
   @@index([farmId])
 }
 
+model Expense {
+  id String @id @default(uuid())
+
+  farmId String
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  flockId String?
+  flock Flock? @relation(fields: [flockId], references: [id], onDelete: SetNull)
+
+  type ExpenseType
+  category String
+
+  amount Float
+
+  description String?
+
+  occurredAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([farmId])
+  @@index([flockId])
+}
+
 model FeedLog{
   id String @id @default(uuid())
   flockId String
   flock Flock @relation(fields: [flockId], references: [id])
   feedType String
-  quantityKg Float?
-  cost Float?
+  quantityKg Float
   notes String?
-  fedAt DateTime
-  createdAt DateTime @default(now())
+  recordedAt DateTime @default(now())
+
+  @@index([flockId, recordedAt])
 }
 
 model HealthRecord{
   id String @id @default(uuid())
   flockId String
   flock Flock @relation(fields: [flockId], references: [id])
-  condition String
+  diagnosis String
   severity Severity
   treatment String?
-  medication String
+  medication String?
   vetNotes String?
-  recordedAt DateTime
-  createdAt DateTime @default(now())
+  recordedAt DateTime @default(now())
+
+  @@index([flockId, recordedAt])
 }
 
 model EggProduction {
@@ -128,8 +163,9 @@ model EggProduction {
   flock Flock @relation(fields: [flockId], references: [id])
   count Int
   broken Int @default(0)
-  recordedAt DateTime
-  createdAt DateTime @default(now())
+  recordedAt DateTime @default(now())
+
+  @@index([flockId, recordedAt])
 }
 
 model MortalityRecord {
@@ -138,8 +174,20 @@ model MortalityRecord {
   flock Flock @relation(fields: [flockId], references: [id])
   count Int
   cause String?
-  recordedAt DateTime
-  createdAt DateTime @default(now())
+  notes String?
+  recordedAt DateTime @default(now())
+
+  @@index([flockId, recordedAt])
+}
+
+model FlockNote{
+  id String @id @default(uuid())
+  flockId String
+  flock Flock @relation(fields: [flockId], references: [id])
+  content String
+  recordedAt DateTime @default(now())
+
+  @@index([flockId, recordedAt])
 }
 
 model AiInteraction {
