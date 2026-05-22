@@ -9,7 +9,7 @@ import type {
   FeedLogWithDetailSelect,
   FeedLogWithListSelect,
 } from "./feed-log.type.js";
-import type { CreateFeedDto } from "./feed-log.schema.js";
+import type { CreateFeedDto, UpdateFeedLogDto } from "./feed-log.schema.js";
 import AppError from "../../../utils/appError.js";
 
 class FeedLogService {
@@ -60,6 +60,49 @@ class FeedLogService {
     if (!log) throw new AppError("Feed log not found", 404);
 
     return log;
+  }
+
+  public async updateFeedLog(
+    ownerId: string,
+    flockId: string,
+    feedLogId: string,
+    updateData: UpdateFeedLogDto,
+  ): Promise<FeedLogWithListSelect | null> {
+    await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    const results = await prisma.feedLog.updateMany({
+      where: {
+        id: feedLogId,
+        flockId,
+      },
+      data: updateData,
+    });
+
+    if (results.count === 0) throw new AppError("Feed log not found", 404);
+
+    return prisma.feedLog.findUnique({
+      where: { id: feedLogId },
+      select: feedLogListSelect,
+    });
+  }
+
+  public async deleteFeedLog(
+    ownerId: string,
+    flockId: string,
+    feedLogId: string,
+  ): Promise<boolean> {
+    await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    const log = await prisma.feedLog.findFirst({
+      where: { id: feedLogId, flockId },
+      select: { id: true },
+    });
+
+    if (!log) throw new AppError("Feed log not found", 404);
+
+    await prisma.feedLog.delete({ where: { id: feedLogId } });
+
+    return true;
   }
 }
 

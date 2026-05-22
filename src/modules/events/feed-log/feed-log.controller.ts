@@ -11,7 +11,7 @@ export class FeedLogController {
     const log = await feedLogService.createFeedLog(userId, flockId, body);
 
     res.status(201).json({
-      status: "message",
+      status: "success",
       data: {
         log,
       },
@@ -25,7 +25,7 @@ export class FeedLogController {
     const logs = await feedLogService.getFlockFeedLogs(userId, flockId);
 
     res.status(201).json({
-      status: "message",
+      status: "success",
       results: logs.length,
       data: {
         logs,
@@ -40,10 +40,46 @@ export class FeedLogController {
     const log = await feedLogService.getFeedLog(userId, flockId, feedLogId);
 
     res.status(200).json({
-      status: "message",
+      status: "success",
       data: {
         log,
       },
     });
+  }
+
+  static async updateFeedLog(req: Request, res: Response): Promise<void> {
+    const { userId, body } = req;
+    const { flockId, feedLogId } = feedLogParamsSchema.parse(req.params);
+
+    const log = await feedLogService.updateFeedLog(
+      userId,
+      flockId,
+      feedLogId,
+      body,
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        log,
+      },
+    });
+  }
+
+  static async deleteFeedLog(req: Request, res: Response): Promise<void> {
+    const { userId } = req;
+    const { flockId, feedLogId } = feedLogParamsSchema.parse(req.params);
+
+    const isDelete = await feedLogService.deleteFeedLog(
+      userId,
+      flockId,
+      feedLogId,
+    );
+
+    if (isDelete)
+      res.status(200).json({
+        status: "success",
+        message: "Log deleted successfully",
+      });
   }
 }
