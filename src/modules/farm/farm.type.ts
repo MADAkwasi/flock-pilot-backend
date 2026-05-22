@@ -2,8 +2,8 @@ import type {
   farmActiveSelect,
   farmDetailSelect,
   farmListSelect,
-} from "../constants/farm.constant.js";
-import type { Prisma } from "../generated/prisma/client.js";
+} from "../../constants/farm.constant.js";
+import type { Prisma } from "../../generated/prisma/client.js";
 
 export type FarmWithListSelect = Prisma.FarmGetPayload<{
   select: typeof farmListSelect;

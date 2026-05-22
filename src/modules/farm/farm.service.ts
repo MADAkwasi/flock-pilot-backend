@@ -7,7 +7,7 @@ import type { Farm } from "../../generated/prisma/client.js";
 import type {
   FarmWithActiveSelect,
   FarmWithDetailSelect,
-} from "../../types/farm.type.js";
+} from "./farm.type.js";
 import AppError from "../../utils/appError.js";
 import type { CreateFarmDto, UpdateFarmDto } from "./farm.scheme.js";
 
@@ -18,8 +18,8 @@ class FarmService {
   ): Promise<Farm> {
     const newFarm = await prisma.farm.create({
       data: {
-        ownerId,
         ...farmData,
+        ownerId,
       },
     });
 
