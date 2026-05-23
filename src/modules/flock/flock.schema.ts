@@ -5,7 +5,6 @@ export const createFlockSchema = z
     name: z.string().min(3),
     breed: z.string().optional(),
     flockType: z.enum(["LAYER", "BROILER"]),
-    farmId: z.uuid(),
     initialCount: z.number(),
     source: z.string().min(3).optional(),
     startDate: z.coerce.date(),

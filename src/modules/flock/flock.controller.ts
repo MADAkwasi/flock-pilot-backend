@@ -1,13 +1,14 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
 import { flockService } from "./flock.service.js";
-import AppError from "../../utils/appError.js";
 import { flockParamsSchema } from "./flock.schema.js";
+import { farmParamSchema } from "../farm/farm.scheme.js";
 
 export class FlockController {
   static async createFlock(req: Request, res: Response): Promise<void> {
     const { userId, body } = req;
+    const { farmId } = farmParamSchema.parse(req.params);
 
-    const flock = await flockService.createFlock(userId, body);
+    const flock = await flockService.createFlock(userId, farmId, body);
 
     res.status(201).json({
       status: "success",
@@ -17,17 +18,9 @@ export class FlockController {
     });
   }
 
-  static async getFarmFlocks(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    const { farmId } = req.query;
-
-    if (!farmId || typeof farmId !== "string")
-      return next(new AppError("Farm id is required", 400));
-
+  static async getFarmFlocks(req: Request, res: Response): Promise<void> {
     const { userId } = req;
+    const { farmId } = farmParamSchema.parse(req.params);
 
     const flocks = await flockService.getFarmFlocks(farmId, userId);
 

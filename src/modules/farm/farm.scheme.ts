@@ -18,6 +18,10 @@ export const updateFarmBodySchema = z
   })
   .strict();
 
+export const farmParamSchema = z.object({
+  farmId: z.uuid(),
+});
+
 // Dedicated param validator
 export const farmParamsSchema = z.object({
   farmId: z.uuid(),
