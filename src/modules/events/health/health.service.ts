@@ -1,7 +1,14 @@
-import { healthListSelect } from "../../../constants/health.constant.js";
+import {
+  healthDetailSelect,
+  healthListSelect,
+} from "../../../constants/health.constant.js";
 import { prisma } from "../../../db/prisma.js";
+import AppError from "../../../utils/appError.js";
 import { flockService } from "../../flock/flock.service.js";
-import type { HealthWithListSelect } from "./health.type.js";
+import type {
+  HealthWithDetailSelect,
+  HealthWithListSelect,
+} from "./health.type.js";
 
 class HealthService {
   public async getFlockHealthRecords(
@@ -14,6 +21,26 @@ class HealthService {
       where: { flockId },
       select: healthListSelect,
     });
+  }
+
+  public async getFlockHealthRecord(
+    flockId: string,
+    ownerId: string,
+    healthRecordId: string,
+  ): Promise<HealthWithDetailSelect | null> {
+    await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    const healthRecord = await prisma.healthRecord.findFirst({
+      where: {
+        id: healthRecordId,
+        flockId,
+      },
+      select: healthDetailSelect,
+    });
+
+    if (!healthRecord) throw new AppError("Health Record not found", 404);
+
+    return healthRecord;
   }
 }
 
