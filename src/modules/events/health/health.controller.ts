@@ -41,4 +41,22 @@ export class HealthController {
       },
     });
   }
+
+  static async createHealthRecord(req: Request, res: Response): Promise<void> {
+    const { userId, body } = req;
+    const { flockId } = flockParamsSchema.parse(req.params);
+
+    const healthRecord = await healthService.createFlockHealthRecord(
+      flockId,
+      userId,
+      body,
+    );
+
+    res.status(201).json({
+      status: "success",
+      data: {
+        healthRecord,
+      },
+    });
+  }
 }

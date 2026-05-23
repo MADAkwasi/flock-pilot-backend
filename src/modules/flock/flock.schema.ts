@@ -1,10 +1,11 @@
 import z from "zod";
+import { FlockStatus, FlockType } from "../../generated/prisma/enums.js";
 
 export const createFlockSchema = z
   .object({
     name: z.string().min(3),
     breed: z.string().optional(),
-    flockType: z.enum(["LAYER", "BROILER"]),
+    flockType: z.enum(FlockType),
     initialCount: z.number(),
     source: z.string().min(3).optional(),
     startDate: z.coerce.date(),
@@ -22,7 +23,7 @@ export const updateFlockSchema = z
 
 export const updateFlockStatusSchema = z
   .object({
-    status: z.enum(["ACTIVE", "SOLD", "ARCHIVED"]),
+    status: z.enum(FlockStatus),
   })
   .strict();
 

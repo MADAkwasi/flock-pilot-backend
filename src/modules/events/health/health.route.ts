@@ -1,10 +1,16 @@
 import { Router } from "express";
 import { protect } from "../../../middleware/auth.middleware.js";
-import { validateParams } from "../../../middleware/validator.middleware.js";
+import {
+  validateBody,
+  validateParams,
+} from "../../../middleware/validator.middleware.js";
 import { flockParamsSchema } from "../../flock/flock.schema.js";
 import { catchAsync } from "../../../utils/catchAsync.js";
 import { HealthController } from "./health.controller.js";
-import { healthRecordParamSchema } from "./health.schema.js";
+import {
+  createHealthRecordSchema,
+  healthRecordParamSchema,
+} from "./health.schema.js";
 
 const router: Router = Router();
 
@@ -15,6 +21,11 @@ router
   .get(
     validateParams(flockParamsSchema),
     catchAsync(HealthController.getHealthRecords),
+  )
+  .post(
+    validateBody(createHealthRecordSchema),
+    validateParams(flockParamsSchema),
+    catchAsync(HealthController.createHealthRecord),
   );
 
 router

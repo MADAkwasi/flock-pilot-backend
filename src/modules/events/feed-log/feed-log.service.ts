@@ -9,14 +9,14 @@ import type {
   FeedLogWithDetailSelect,
   FeedLogWithListSelect,
 } from "./feed-log.type.js";
-import type { CreateFeedDto, UpdateFeedLogDto } from "./feed-log.schema.js";
+import type { FeedLogDto, UpdateFeedLogDto } from "./feed-log.schema.js";
 import AppError from "../../../utils/appError.js";
 
 class FeedLogService {
   public async createFeedLog(
     ownerId: string,
     flockId: string,
-    feedData: CreateFeedDto,
+    feedData: FeedLogDto,
   ): Promise<FeedLog> {
     await flockService.ensureOwnedFlock(flockId, ownerId);
 

@@ -3,8 +3,10 @@ import {
   healthListSelect,
 } from "../../../constants/health.constant.js";
 import { prisma } from "../../../db/prisma.js";
+import type { HealthRecord } from "../../../generated/prisma/client.js";
 import AppError from "../../../utils/appError.js";
 import { flockService } from "../../flock/flock.service.js";
+import type { HealthRecordDto } from "./health.schema.js";
 import type {
   HealthWithDetailSelect,
   HealthWithListSelect,
@@ -41,6 +43,21 @@ class HealthService {
     if (!healthRecord) throw new AppError("Health Record not found", 404);
 
     return healthRecord;
+  }
+
+  public async createFlockHealthRecord(
+    flockId: string,
+    ownerId: string,
+    healthRecordData: HealthRecordDto,
+  ): Promise<HealthRecord> {
+    await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    return prisma.healthRecord.create({
+      data: {
+        ...healthRecordData,
+        flockId,
+      },
+    });
   }
 }
 
