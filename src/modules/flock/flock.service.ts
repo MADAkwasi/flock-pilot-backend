@@ -19,18 +19,20 @@ import type {
 class FlockService {
   public async createFlock(
     ownerId: string,
+    farmId: string,
     flockData: FlockDto,
   ): Promise<Flock> {
     const farm = await prisma.farm.findFirst({
-      where: { id: flockData.farmId, ownerId, isActive: true },
+      where: { id: farmId, ownerId, isActive: true },
       select: { id: true },
     });
 
     if (!farm) throw new AppError("Farm not found", 404);
 
-    return await prisma.flock.create({
+    return prisma.flock.create({
       data: {
         ...flockData,
+        farmId,
         currentCount: flockData.initialCount,
       },
     });

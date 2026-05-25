@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./modules/auth/auth.route.js";
 import farmRouter from "./modules/farm/farm.route.js";
 import flockRouter from "./modules/flock/flock.route.js";
+import healthRouter from "./modules/events/health/health.route.js";
 import feedLogRouter from "./modules/events/feed-log/feed-log.route.js";
 import morgan from "morgan";
 import { env } from "./config/env.js";
@@ -28,6 +29,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/farms", farmRouter);
 app.use("/api/v1/flocks", flockRouter);
 app.use("/api/v1/feed-logs", feedLogRouter);
+app.use("/api/v1/health-records", healthRouter);
 
 app.all("/{*splat}", (req: Request, _: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

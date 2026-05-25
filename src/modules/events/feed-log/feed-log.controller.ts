@@ -70,16 +70,11 @@ export class FeedLogController {
     const { userId } = req;
     const { flockId, feedLogId } = feedLogParamsSchema.parse(req.params);
 
-    const isDelete = await feedLogService.deleteFeedLog(
-      userId,
-      flockId,
-      feedLogId,
-    );
+    await feedLogService.deleteFeedLog(userId, flockId, feedLogId);
 
-    if (isDelete)
-      res.status(200).json({
-        status: "success",
-        message: "Log deleted successfully",
-      });
+    res.status(200).json({
+      status: "success",
+      message: "Log deleted successfully",
+    });
   }
 }
