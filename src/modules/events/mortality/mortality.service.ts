@@ -127,6 +127,46 @@ class MortalityService {
       return updatedRecord;
     });
   }
+
+  public async deleteFlockMortalityRecord(
+    flockId: string,
+    ownerId: string,
+    mortalityRecordId: string,
+  ): Promise<void> {
+    await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    await prisma.$transaction(async (tx) => {
+      const record = await tx.mortalityRecord.findFirst({
+        where: {
+          id: mortalityRecordId,
+          flockId,
+        },
+        select: {
+          id: true,
+          count: true,
+        },
+      });
+
+      if (!record) throw new AppError("Mortality record not found", 404);
+
+      await tx.flock.update({
+        where: {
+          id: flockId,
+        },
+        data: {
+          currentCount: {
+            increment: record.count,
+          },
+        },
+      });
+
+      await tx.mortalityRecord.delete({
+        where: {
+          id: mortalityRecordId,
+        },
+      });
+    });
+  }
 }
 
 export const mortalityService = new MortalityService();

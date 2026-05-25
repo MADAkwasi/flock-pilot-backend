@@ -86,4 +86,25 @@ export class MortalityController {
       },
     });
   }
+
+  static async deleteMortalityRecord(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    const { userId } = req;
+    const { flockId, mortalityRecordId } = mortalityRecordParamSchema.parse(
+      req.params,
+    );
+
+    await mortalityService.deleteFlockMortalityRecord(
+      flockId,
+      userId,
+      mortalityRecordId,
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Mortality record deleted successfully. Flock count restored",
+    });
+  }
 }

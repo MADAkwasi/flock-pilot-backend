@@ -39,6 +39,10 @@ router
     validateParams(mortalityRecordParamSchema),
     validateBody(updateMortalityRecordSchema),
     catchAsync(MortalityController.updateMortalityRecord),
+  )
+  .delete(
+    validateParams(mortalityRecordParamSchema),
+    catchAsync(MortalityController.deleteMortalityRecord),
   );
 
 export default router;
