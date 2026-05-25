@@ -45,16 +45,42 @@ export class MortalityController {
 
   static async getMortalityRecord(req: Request, res: Response): Promise<void> {
     const { userId } = req;
-    const { flockId, recordId } = mortalityRecordParamSchema.parse(req.params);
+    const { flockId, mortalityRecordId } = mortalityRecordParamSchema.parse(
+      req.params,
+    );
 
     const mortalityRecord = await mortalityService.getFlockMortalityRecord(
       flockId,
       userId,
-      recordId,
+      mortalityRecordId,
     );
 
     res.status(200).json({
       status: "success",
+      data: {
+        mortalityRecord,
+      },
+    });
+  }
+
+  static async updateMortalityRecord(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    const { userId, body } = req;
+    const { flockId, mortalityRecordId } = mortalityRecordParamSchema.parse(
+      req.params,
+    );
+
+    const mortalityRecord = await mortalityService.updateFlockMortalityRecord(
+      flockId,
+      userId,
+      mortalityRecordId,
+      body,
+    );
+
+    res.status(200).json({
+      message: "success",
       data: {
         mortalityRecord,
       },

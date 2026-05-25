@@ -10,6 +10,7 @@ import { MortalityController } from "./mortality.controller.js";
 import {
   createMortalityRecordSchema,
   mortalityRecordParamSchema,
+  updateMortalityRecordSchema,
 } from "./mortality.schema.js";
 
 const router: Router = Router();
@@ -33,6 +34,11 @@ router
   .get(
     validateParams(mortalityRecordParamSchema),
     catchAsync(MortalityController.getMortalityRecord),
+  )
+  .patch(
+    validateParams(mortalityRecordParamSchema),
+    validateBody(updateMortalityRecordSchema),
+    catchAsync(MortalityController.updateMortalityRecord),
   );
 
 export default router;

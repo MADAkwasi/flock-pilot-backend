@@ -6,7 +6,10 @@ import { prisma } from "../../../db/prisma.js";
 import type { MortalityRecord } from "../../../generated/prisma/client.js";
 import AppError from "../../../utils/appError.js";
 import { flockService } from "../../flock/flock.service.js";
-import type { MortalityRecordDto } from "./mortality.schema.js";
+import type {
+  MortalityRecordDto,
+  UpdateMortalityRecordDto,
+} from "./mortality.schema.js";
 import type {
   MortalityWithDetailSelect,
   MortalityWithListSelect,
@@ -18,8 +21,6 @@ class MortalityService {
     ownerId: string,
     mortalityData: MortalityRecordDto,
   ): Promise<MortalityRecord> {
-    let mortalityRecord: MortalityRecord;
-
     const flock = await flockService.ensureOwnedFlock(flockId, ownerId);
 
     if (mortalityData.count > flock.currentCount)
@@ -29,7 +30,7 @@ class MortalityService {
       );
 
     return await prisma.$transaction(async (tx) => {
-      mortalityRecord = await tx.mortalityRecord.create({
+      const mortalityRecord = await tx.mortalityRecord.create({
         data: {
           ...mortalityData,
           flockId,
@@ -65,18 +66,66 @@ class MortalityService {
   public async getFlockMortalityRecord(
     flockId: string,
     ownerId: string,
-    recordId: string,
+    mortalityRecordId: string,
   ): Promise<MortalityWithDetailSelect> {
     await flockService.ensureOwnedFlock(flockId, ownerId);
 
     const mortalityRecord = await prisma.mortalityRecord.findFirst({
-      where: { id: recordId, flockId },
+      where: { id: mortalityRecordId, flockId },
       select: mortalityDetailSelect,
     });
 
     if (!mortalityRecord) throw new AppError("Mortality record not found", 404);
 
     return mortalityRecord;
+  }
+
+  public async updateFlockMortalityRecord(
+    flockId: string,
+    ownerId: string,
+    mortalityRecordId: string,
+    updateData: UpdateMortalityRecordDto,
+  ): Promise<MortalityWithDetailSelect> {
+    const flock = await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    return prisma.$transaction(async (tx) => {
+      const record = await tx.mortalityRecord.findFirst({
+        where: { id: mortalityRecordId, flockId },
+      });
+
+      if (!record) throw new AppError("Mortality record not found", 404);
+
+      const availableCount = flock.currentCount + record.count;
+
+      if (updateData.count !== undefined && updateData.count > availableCount) {
+        throw new AppError(
+          "Mortality count exceeds available flock population",
+          400,
+        );
+      }
+
+      const updatedRecord = await tx.mortalityRecord.update({
+        where: { id: mortalityRecordId },
+        data: updateData,
+        select: mortalityDetailSelect,
+      });
+
+      if (updateData.count !== undefined) {
+        const difference = updatedRecord.count - record.count;
+
+        await tx.flock.update({
+          where: { id: flockId },
+          data: {
+            currentCount:
+              difference > 0
+                ? { decrement: difference }
+                : { increment: Math.abs(difference) },
+          },
+        });
+      }
+
+      return updatedRecord;
+    });
   }
 }
 
