@@ -10,6 +10,7 @@ import { HealthController } from "./health.controller.js";
 import {
   createHealthRecordSchema,
   healthRecordParamSchema,
+  updateHealthRecordSchema,
 } from "./health.schema.js";
 
 const router: Router = Router();
@@ -33,6 +34,15 @@ router
   .get(
     validateParams(healthRecordParamSchema),
     catchAsync(HealthController.getHealthRecord),
+  )
+  .patch(
+    validateParams(healthRecordParamSchema),
+    validateBody(updateHealthRecordSchema),
+    catchAsync(HealthController.updateHealthRecord),
+  )
+  .delete(
+    validateParams(healthRecordParamSchema),
+    catchAsync(HealthController.deleteHealthRecord),
   );
 
 export default router;

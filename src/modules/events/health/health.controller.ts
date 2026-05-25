@@ -59,4 +59,43 @@ export class HealthController {
       },
     });
   }
+
+  static async deleteHealthRecord(req: Request, res: Response): Promise<void> {
+    const { userId } = req;
+    const { flockId, healthRecordId } = healthRecordParamSchema.parse(
+      req.params,
+    );
+
+    await healthService.deleteFlockHealthRecord(
+      flockId,
+      userId,
+      healthRecordId,
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Health record deleted successfully",
+    });
+  }
+
+  static async updateHealthRecord(req: Request, res: Response): Promise<void> {
+    const { userId, body } = req;
+    const { flockId, healthRecordId } = healthRecordParamSchema.parse(
+      req.params,
+    );
+
+    const healthRecord = await healthService.updateFlockHealthRecord(
+      flockId,
+      userId,
+      healthRecordId,
+      body,
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        healthRecord,
+      },
+    });
+  }
 }
