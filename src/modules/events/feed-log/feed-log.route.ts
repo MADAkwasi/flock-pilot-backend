@@ -30,7 +30,7 @@ router
   );
 
 router
-  .route("/:flockId/feed-log/:feedLogId")
+  .route("/:flockId/log/:feedLogId")
   .get(
     validateParams(feedLogParamsSchema),
     catchAsync(FeedLogController.getFeedLog),

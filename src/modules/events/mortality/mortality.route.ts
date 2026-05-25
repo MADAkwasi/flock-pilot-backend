@@ -29,7 +29,7 @@ router
   );
 
 router
-  .route("/:flockId/record/:recordId")
+  .route("/:flockId/record/:mortalityRecordId")
   .get(
     validateParams(mortalityRecordParamSchema),
     catchAsync(MortalityController.getMortalityRecord),
