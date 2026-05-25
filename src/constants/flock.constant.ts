@@ -1,5 +1,6 @@
 import { feedLogListSelect } from "./feed-log.constant.js";
 import { healthListSelect } from "./health.constant.js";
+import { mortalityListSelect } from "./mortality.constant.js";
 
 export const flockListSelect = {
   id: true,
@@ -28,12 +29,7 @@ export const flockDetailSelect = {
     },
   },
   mortality: {
-    select: {
-      id: true,
-      count: true,
-      cause: true,
-      recordedAt: true,
-    },
+    select: mortalityListSelect,
   },
   eggs: {
     select: {
