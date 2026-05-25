@@ -18,7 +18,7 @@ const router: Router = Router();
 router.use(protect);
 
 router
-  .route("/:farmId")
+  .route("/farm/:farmId")
   .get(catchAsync(FlockController.getFarmFlocks))
   .post(
     validateBody(createFlockSchema),

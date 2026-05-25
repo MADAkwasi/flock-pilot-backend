@@ -30,7 +30,7 @@ router
   );
 
 router
-  .route("/:flockId/:healthRecordId")
+  .route("/:flockId/record/:healthRecordId")
   .get(
     validateParams(healthRecordParamSchema),
     catchAsync(HealthController.getHealthRecord),
