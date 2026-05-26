@@ -1,3 +1,4 @@
+import { eggProductionListSelect } from "./eggs.constants.js";
 import { feedLogListSelect } from "./feed-log.constant.js";
 import { healthListSelect } from "./health.constant.js";
 import { mortalityListSelect } from "./mortality.constant.js";
@@ -32,12 +33,7 @@ export const flockDetailSelect = {
     select: mortalityListSelect,
   },
   eggs: {
-    select: {
-      id: true,
-      count: true,
-      broken: true,
-      recordedAt: true,
-    },
+    select: eggProductionListSelect,
   },
   health: {
     select: healthListSelect,
@@ -60,6 +56,28 @@ export const flockDetailSelect = {
       amount: true,
       description: true,
       occurredAt: true,
+    },
+  },
+  inventoryTransactions: {
+    select: {
+      id: true,
+      inventoryItem: {
+        select: {
+          name: true,
+          category: true,
+        },
+      },
+      type: true,
+      quantity: true,
+      unitCost: true,
+    },
+  },
+  sales: {
+    select: {
+      id: true,
+      type: true,
+      totalAmount: true,
+      customerName: true,
     },
   },
 } as const;

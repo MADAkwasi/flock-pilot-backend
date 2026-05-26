@@ -140,6 +140,7 @@ class FlockService {
         id: true,
         farmId: true,
         currentCount: true,
+        flockType: true,
       },
     });
 
