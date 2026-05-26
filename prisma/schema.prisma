@@ -57,6 +57,7 @@ enum ExpenseType {
 
 enum InventoryCategory {
   FEED
+  EGGS
   MEDICATION
   CRATE
   EQUIPMENT
@@ -69,6 +70,8 @@ enum InventoryTransactionType {
   CONSUMPTION
   ADJUSTMENT
   LOSS
+  PRODUCTION
+  SALE
 }
 
 enum SaleType {
