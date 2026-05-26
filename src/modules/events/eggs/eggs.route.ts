@@ -8,6 +8,7 @@ import { flockParamsSchema } from "../../flock/flock.schema.js";
 import {
   createEggProductionSchema,
   eggProductionParamSchema,
+  updateEggProductionSchema,
 } from "./eggs.schema.js";
 import { catchAsync } from "../../../utils/catchAsync.js";
 import { EggProductionController } from "./eggs.controller.js";
@@ -33,6 +34,15 @@ router
   .get(
     validateParams(eggProductionParamSchema),
     catchAsync(EggProductionController.getEggProduction),
+  )
+  .delete(
+    validateParams(eggProductionParamSchema),
+    catchAsync(EggProductionController.deleteEggProductionRecord),
+  )
+  .patch(
+    validateParams(eggProductionParamSchema),
+    validateBody(updateEggProductionSchema),
+    catchAsync(EggProductionController.updateEggProductionRecord),
   );
 
 export default router;

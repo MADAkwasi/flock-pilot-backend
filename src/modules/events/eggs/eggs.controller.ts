@@ -60,4 +60,50 @@ export class EggProductionController {
       },
     });
   }
+
+  static async deleteEggProductionRecord(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    const { userId } = req;
+    const { flockId, productionId } = eggProductionParamSchema.parse(
+      req.params,
+    );
+
+    await eggProductionService.deleteFlockEggProduction(
+      flockId,
+      userId,
+      productionId,
+    );
+
+    res.status(200).json({
+      status: "success",
+      message:
+        "Egg production record deleted successfully. Egg inventory updated",
+    });
+  }
+
+  static async updateEggProductionRecord(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    const { userId, body } = req;
+    const { flockId, productionId } = eggProductionParamSchema.parse(
+      req.params,
+    );
+
+    const eggProduction = await eggProductionService.updateEggProduction(
+      flockId,
+      userId,
+      productionId,
+      body,
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        egg: eggProduction,
+      },
+    });
+  }
 }

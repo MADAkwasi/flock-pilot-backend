@@ -39,7 +39,6 @@ class EggProductionService {
       productionData.count - (productionData.broken ?? 0),
     );
 
-    console.log(validEggCount);
     return prisma.$transaction(async (tx) => {
       const eggProduction = await tx.eggProduction.create({
         data: {
@@ -112,6 +111,152 @@ class EggProductionService {
       throw new AppError("Egg production record not found", 404);
 
     return eggProduction;
+  }
+
+  public async deleteFlockEggProduction(
+    flockId: string,
+    ownerId: string,
+    productionId: string,
+  ): Promise<void> {
+    const flock = await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    return prisma.$transaction(async (tx) => {
+      const eggProduction = await tx.eggProduction.findFirst({
+        where: {
+          id: productionId,
+          flockId,
+        },
+      });
+
+      if (!eggProduction) {
+        throw new AppError("Egg production record not found", 404);
+      }
+
+      const validEggCount = Math.max(
+        0,
+        eggProduction.count - eggProduction.broken,
+      );
+
+      const eggInventory = await tx.inventoryItem.findFirst({
+        where: {
+          farmId: flock.farmId,
+          name: "Eggs",
+        },
+      });
+
+      if (!eggInventory) {
+        throw new AppError("Egg inventory record not found", 404);
+      }
+
+      if (eggInventory.quantity < validEggCount) {
+        throw new AppError(
+          "Cannot delete production record because eggs have already been consumed or sold",
+          400,
+        );
+      }
+
+      await tx.inventoryItem.update({
+        where: {
+          id: eggInventory.id,
+        },
+        data: {
+          quantity: {
+            decrement: validEggCount,
+          },
+        },
+      });
+
+      await tx.eggProduction.delete({
+        where: {
+          id: eggProduction.id,
+        },
+      });
+    });
+  }
+
+  public async updateEggProduction(
+    flockId: string,
+    ownerId: string,
+    productionId: string,
+    updateData: EggProductionDto,
+  ): Promise<EggProduction> {
+    const flock = await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    if (flock.flockType !== FlockType.LAYER) {
+      throw new AppError(
+        "Egg production can only be recorded for layer flocks",
+        400,
+      );
+    }
+
+    return prisma.$transaction(async (tx) => {
+      const existingProduction = await tx.eggProduction.findFirst({
+        where: {
+          id: productionId,
+          flockId,
+        },
+      });
+
+      if (!existingProduction)
+        throw new AppError("Egg production record not found", 404);
+
+      const oldValidEggCount = Math.max(
+        0,
+        existingProduction.count - existingProduction.broken,
+      );
+
+      const newValidEggCount = Math.max(
+        0,
+        updateData.count - (updateData.broken ?? 0),
+      );
+
+      const inventoryDifference = newValidEggCount - oldValidEggCount;
+
+      const eggInventory = await tx.inventoryItem.findFirst({
+        where: {
+          farmId: flock.farmId,
+          name: "Eggs",
+        },
+      });
+
+      if (!eggInventory)
+        throw new AppError("Egg inventory record not found", 404);
+
+      if (
+        inventoryDifference < 0 &&
+        eggInventory.quantity < Math.abs(inventoryDifference)
+      ) {
+        throw new AppError(
+          "Cannot reduce egg production below already consumed or sold inventory",
+          400,
+        );
+      }
+
+      await tx.inventoryItem.update({
+        where: {
+          id: eggInventory.id,
+        },
+        data: {
+          quantity:
+            inventoryDifference >= 0
+              ? {
+                  increment: inventoryDifference,
+                }
+              : {
+                  decrement: Math.abs(inventoryDifference),
+                },
+        },
+      });
+
+      return tx.eggProduction.update({
+        where: {
+          id: productionId,
+        },
+        data: {
+          ...updateData,
+        },
+      });
+    });
   }
 }
 
