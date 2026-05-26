@@ -40,8 +40,6 @@ class EggProductionService {
       productionData.count - (productionData.broken ?? 0),
     );
 
-    console.log(validEggCount);
-
     return prisma.$transaction(async (tx) => {
       const eggProduction = await tx.eggProduction.create({
         data: {
@@ -76,7 +74,6 @@ class EggProductionService {
           type: InventoryTransactionType.PRODUCTION,
           quantity: validEggCount,
           notes: "Egg production recorded",
-          occurredAt: new Date(),
         },
       });
 
@@ -159,7 +156,6 @@ class EggProductionService {
           type: InventoryTransactionType.ADJUSTMENT,
           quantity: -validEggCount,
           notes: "Reversal of deleted egg production",
-          occurredAt: new Date(),
         },
       });
 
@@ -230,7 +226,6 @@ class EggProductionService {
             type: InventoryTransactionType.ADJUSTMENT,
             quantity: delta,
             notes: "Adjustment from egg production update",
-            occurredAt: new Date(),
           },
         });
       }

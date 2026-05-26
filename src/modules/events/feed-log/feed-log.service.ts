@@ -3,7 +3,10 @@ import {
   feedLogListSelect,
 } from "../../../constants/feed-log.constant.js";
 import { prisma } from "../../../db/prisma.js";
-import type { FeedLog } from "../../../generated/prisma/client.js";
+import {
+  InventoryTransactionType,
+  type FeedLog,
+} from "../../../generated/prisma/client.js";
 import { flockService } from "../../flock/flock.service.js";
 import type {
   FeedLogWithDetailSelect,
@@ -18,13 +21,42 @@ class FeedLogService {
     flockId: string,
     feedData: FeedLogDto,
   ): Promise<FeedLog> {
-    await flockService.ensureOwnedFlock(flockId, ownerId);
+    const { farmId } = await flockService.ensureOwnedFlock(flockId, ownerId);
 
-    return prisma.feedLog.create({
-      data: {
-        ...feedData,
-        flockId,
-      },
+    return prisma.$transaction(async (tx) => {
+      const inventoryItem = await tx.inventoryItem.findFirst({
+        where: {
+          id: feedData.inventoryItemId,
+          farmId,
+        },
+      });
+
+      if (!inventoryItem) {
+        throw new AppError("Feed inventory item not found", 404);
+      }
+
+      const feedLog = await tx.feedLog.create({
+        data: {
+          flockId,
+          inventoryItemId: inventoryItem.id,
+          feedType: inventoryItem.name,
+          quantityKg: feedData.quantityKg,
+          notes: feedData.notes,
+        },
+      });
+
+      await tx.inventoryTransaction.create({
+        data: {
+          farmId,
+          flockId,
+          inventoryItemId: inventoryItem.id,
+          type: InventoryTransactionType.CONSUMPTION,
+          quantity: -feedData.quantityKg,
+          notes: "Feed consumption",
+        },
+      });
+
+      return feedLog;
     });
   }
 
@@ -67,22 +99,54 @@ class FeedLogService {
     flockId: string,
     feedLogId: string,
     updateData: UpdateFeedLogDto,
-  ): Promise<FeedLogWithListSelect | null> {
-    await flockService.ensureOwnedFlock(flockId, ownerId);
+  ): Promise<FeedLogWithListSelect> {
+    const { farmId } = await flockService.ensureOwnedFlock(flockId, ownerId);
 
-    const results = await prisma.feedLog.updateMany({
-      where: {
-        id: feedLogId,
-        flockId,
-      },
-      data: updateData,
-    });
+    return prisma.$transaction(async (tx) => {
+      const existing = await tx.feedLog.findFirst({
+        where: {
+          id: feedLogId,
+          flockId,
+        },
+      });
 
-    if (results.count === 0) throw new AppError("Feed log not found", 404);
+      if (!existing) {
+        throw new AppError("Feed log not found", 404);
+      }
 
-    return prisma.feedLog.findUnique({
-      where: { id: feedLogId },
-      select: feedLogListSelect,
+      const newQuantity = updateData.quantityKg ?? existing.quantityKg;
+
+      const delta = newQuantity - existing.quantityKg;
+
+      if (delta !== 0) {
+        await tx.inventoryTransaction.create({
+          data: {
+            farmId,
+            flockId,
+            inventoryItemId: existing.inventoryItemId,
+            type: InventoryTransactionType.ADJUSTMENT,
+            quantity: -delta,
+            notes: "Feed log adjustment",
+          },
+        });
+      }
+
+      await tx.feedLog.update({
+        where: {
+          id: feedLogId,
+        },
+        data: {
+          quantityKg: newQuantity,
+          notes: updateData.notes,
+        },
+      });
+
+      return tx.feedLog.findUniqueOrThrow({
+        where: {
+          id: feedLogId,
+        },
+        select: feedLogListSelect,
+      });
     });
   }
 
@@ -91,18 +155,39 @@ class FeedLogService {
     flockId: string,
     feedLogId: string,
   ): Promise<boolean> {
-    await flockService.ensureOwnedFlock(flockId, ownerId);
+    const { farmId } = await flockService.ensureOwnedFlock(flockId, ownerId);
 
-    const log = await prisma.feedLog.findFirst({
-      where: { id: feedLogId, flockId },
-      select: { id: true },
+    return prisma.$transaction(async (tx) => {
+      const log = await tx.feedLog.findFirst({
+        where: {
+          id: feedLogId,
+          flockId,
+        },
+      });
+
+      if (!log) {
+        throw new AppError("Feed log not found", 404);
+      }
+
+      await tx.inventoryTransaction.create({
+        data: {
+          farmId,
+          flockId,
+          inventoryItemId: log.inventoryItemId,
+          type: InventoryTransactionType.ADJUSTMENT,
+          quantity: log.quantityKg,
+          notes: "Reversal of deleted feed log",
+        },
+      });
+
+      await tx.feedLog.delete({
+        where: {
+          id: feedLogId,
+        },
+      });
+
+      return true;
     });
-
-    if (!log) throw new AppError("Feed log not found", 404);
-
-    await prisma.feedLog.delete({ where: { id: feedLogId } });
-
-    return true;
   }
 }
 

@@ -4,6 +4,7 @@ export const createFeedLogSchema = z
   .object({
     feedType: z.string().min(3),
     quantityKg: z.number(),
+    inventoryItemId: z.uuid(),
     notes: z.string().min(3).optional(),
   })
   .strict();
