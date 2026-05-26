@@ -231,7 +231,6 @@ model InventoryItem {
   category InventoryCategory
   unit String // e.g. "kg", "bags", "boxes"
 
-  quantity Float @default(0)
   reorderLevel Float?
 
   costPerUnit Float?

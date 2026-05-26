@@ -6,6 +6,7 @@ import { prisma } from "../../../db/prisma.js";
 import {
   FlockType,
   InventoryCategory,
+  InventoryTransactionType,
   type EggProduction,
 } from "../../../generated/prisma/client.js";
 import AppError from "../../../utils/appError.js";
@@ -39,6 +40,8 @@ class EggProductionService {
       productionData.count - (productionData.broken ?? 0),
     );
 
+    console.log(validEggCount);
+
     return prisma.$transaction(async (tx) => {
       const eggProduction = await tx.eggProduction.create({
         data: {
@@ -47,35 +50,35 @@ class EggProductionService {
         },
       });
 
-      const existingEggInventory = await tx.inventoryItem.findFirst({
+      let eggInventory = await tx.inventoryItem.findFirst({
         where: {
           farmId,
           name: "Eggs",
         },
       });
 
-      if (existingEggInventory) {
-        await tx.inventoryItem.update({
-          where: {
-            id: existingEggInventory.id,
-          },
-          data: {
-            quantity: {
-              increment: validEggCount,
-            },
-          },
-        });
-      } else {
-        await tx.inventoryItem.create({
+      if (!eggInventory) {
+        eggInventory = await tx.inventoryItem.create({
           data: {
             farmId,
             name: "Eggs",
             category: InventoryCategory.EGGS,
             unit: "pieces",
-            quantity: validEggCount,
           },
         });
       }
+
+      await tx.inventoryTransaction.create({
+        data: {
+          farmId,
+          flockId,
+          inventoryItemId: eggInventory.id,
+          type: InventoryTransactionType.PRODUCTION,
+          quantity: validEggCount,
+          notes: "Egg production recorded",
+          occurredAt: new Date(),
+        },
+      });
 
       return eggProduction;
     });
@@ -118,7 +121,7 @@ class EggProductionService {
     ownerId: string,
     productionId: string,
   ): Promise<void> {
-    const flock = await flockService.ensureOwnedFlock(flockId, ownerId);
+    const { farmId } = await flockService.ensureOwnedFlock(flockId, ownerId);
 
     return prisma.$transaction(async (tx) => {
       const eggProduction = await tx.eggProduction.findFirst({
@@ -134,12 +137,12 @@ class EggProductionService {
 
       const validEggCount = Math.max(
         0,
-        eggProduction.count - eggProduction.broken,
+        eggProduction.count - (eggProduction.broken ?? 0),
       );
 
       const eggInventory = await tx.inventoryItem.findFirst({
         where: {
-          farmId: flock.farmId,
+          farmId,
           name: "Eggs",
         },
       });
@@ -148,21 +151,15 @@ class EggProductionService {
         throw new AppError("Egg inventory record not found", 404);
       }
 
-      if (eggInventory.quantity < validEggCount) {
-        throw new AppError(
-          "Cannot delete production record because eggs have already been consumed or sold",
-          400,
-        );
-      }
-
-      await tx.inventoryItem.update({
-        where: {
-          id: eggInventory.id,
-        },
+      await tx.inventoryTransaction.create({
         data: {
-          quantity: {
-            decrement: validEggCount,
-          },
+          farmId,
+          flockId,
+          inventoryItemId: eggInventory.id,
+          type: InventoryTransactionType.ADJUSTMENT,
+          quantity: -validEggCount,
+          notes: "Reversal of deleted egg production",
+          occurredAt: new Date(),
         },
       });
 
@@ -180,9 +177,12 @@ class EggProductionService {
     productionId: string,
     updateData: EggProductionDto,
   ): Promise<EggProduction> {
-    const flock = await flockService.ensureOwnedFlock(flockId, ownerId);
+    const { flockType, farmId } = await flockService.ensureOwnedFlock(
+      flockId,
+      ownerId,
+    );
 
-    if (flock.flockType !== FlockType.LAYER) {
+    if (flockType !== FlockType.LAYER) {
       throw new AppError(
         "Egg production can only be recorded for layer flocks",
         400,
@@ -190,70 +190,58 @@ class EggProductionService {
     }
 
     return prisma.$transaction(async (tx) => {
-      const existingProduction = await tx.eggProduction.findFirst({
+      const existing = await tx.eggProduction.findFirst({
         where: {
           id: productionId,
           flockId,
         },
       });
 
-      if (!existingProduction)
+      if (!existing) {
         throw new AppError("Egg production record not found", 404);
+      }
 
-      const oldValidEggCount = Math.max(
-        0,
-        existingProduction.count - existingProduction.broken,
-      );
+      const oldValid = Math.max(0, existing.count - (existing.broken ?? 0));
 
-      const newValidEggCount = Math.max(
-        0,
-        updateData.count - (updateData.broken ?? 0),
-      );
+      const newCount = updateData.count ?? existing.count;
+      const newBroken = updateData.broken ?? existing.broken;
 
-      const inventoryDifference = newValidEggCount - oldValidEggCount;
+      const newValid = Math.max(0, newCount - newBroken);
+
+      const delta = newValid - oldValid;
 
       const eggInventory = await tx.inventoryItem.findFirst({
         where: {
-          farmId: flock.farmId,
+          farmId,
           name: "Eggs",
         },
       });
 
-      if (!eggInventory)
+      if (!eggInventory) {
         throw new AppError("Egg inventory record not found", 404);
-
-      if (
-        inventoryDifference < 0 &&
-        eggInventory.quantity < Math.abs(inventoryDifference)
-      ) {
-        throw new AppError(
-          "Cannot reduce egg production below already consumed or sold inventory",
-          400,
-        );
       }
 
-      await tx.inventoryItem.update({
-        where: {
-          id: eggInventory.id,
-        },
-        data: {
-          quantity:
-            inventoryDifference >= 0
-              ? {
-                  increment: inventoryDifference,
-                }
-              : {
-                  decrement: Math.abs(inventoryDifference),
-                },
-        },
-      });
+      if (delta !== 0) {
+        await tx.inventoryTransaction.create({
+          data: {
+            farmId,
+            flockId,
+            inventoryItemId: eggInventory.id,
+            type: InventoryTransactionType.ADJUSTMENT,
+            quantity: delta,
+            notes: "Adjustment from egg production update",
+            occurredAt: new Date(),
+          },
+        });
+      }
 
       return tx.eggProduction.update({
         where: {
           id: productionId,
         },
         data: {
-          ...updateData,
+          count: newCount,
+          broken: newBroken,
         },
       });
     });

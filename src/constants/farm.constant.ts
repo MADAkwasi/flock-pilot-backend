@@ -37,7 +37,6 @@ export const farmDetailSelect = {
       name: true,
       category: true,
       unit: true,
-      quantity: true,
     },
   },
   inventoryTransactions: {
