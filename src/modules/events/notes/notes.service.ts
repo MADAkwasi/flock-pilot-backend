@@ -104,7 +104,7 @@ class NoteService {
   ): Promise<FlockNote | null> {
     await flockService.ensureOwnedFlock(flockId, ownerId);
 
-    const note = prisma.flockNote.findFirst({
+    const note = await prisma.flockNote.findFirst({
       where: {
         id: noteId,
         flockId,

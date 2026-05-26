@@ -23,7 +23,7 @@ router
   );
 
 router
-  .route("/:flockId/note/noteId")
+  .route("/:flockId/note/:noteId")
   .get(validateParams(notesParamSchema), catchAsync(NoteController.getNote))
   .patch(
     validateParams(notesParamSchema),
