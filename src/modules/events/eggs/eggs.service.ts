@@ -1,3 +1,7 @@
+import {
+  eggProductionDetailSelect,
+  eggProductionListSelect,
+} from "../../../constants/eggs.constants.js";
 import { prisma } from "../../../db/prisma.js";
 import {
   FlockType,
@@ -7,6 +11,10 @@ import {
 import AppError from "../../../utils/appError.js";
 import { flockService } from "../../flock/flock.service.js";
 import type { EggProductionDto } from "./eggs.schema.js";
+import type {
+  EggProductionWithDetailSelect,
+  EggProductionWithListSelect,
+} from "./eggs.type.js";
 
 class EggProductionService {
   public async createEggProduction(
@@ -72,6 +80,38 @@ class EggProductionService {
 
       return eggProduction;
     });
+  }
+
+  public async getFlockEggProductionHistory(
+    flockId: string,
+    ownerId: string,
+  ): Promise<EggProductionWithListSelect[]> {
+    await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    return prisma.eggProduction.findMany({
+      where: {
+        flockId,
+      },
+      select: eggProductionListSelect,
+    });
+  }
+
+  public async getFlockEggProduction(
+    flockId: string,
+    ownerId: string,
+    productionId: string,
+  ): Promise<EggProductionWithDetailSelect> {
+    await flockService.ensureOwnedFlock(flockId, ownerId);
+
+    const eggProduction = await prisma.eggProduction.findUnique({
+      where: { id: productionId },
+      select: eggProductionDetailSelect,
+    });
+
+    if (!eggProduction)
+      throw new AppError("Egg production record not found", 404);
+
+    return eggProduction;
   }
 }
 

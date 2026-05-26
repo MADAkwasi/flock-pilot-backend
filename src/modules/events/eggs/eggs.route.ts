@@ -5,7 +5,10 @@ import {
   validateParams,
 } from "../../../middleware/validator.middleware.js";
 import { flockParamsSchema } from "../../flock/flock.schema.js";
-import { createEggProductionSchema } from "./eggs.schema.js";
+import {
+  createEggProductionSchema,
+  eggProductionParamSchema,
+} from "./eggs.schema.js";
 import { catchAsync } from "../../../utils/catchAsync.js";
 import { EggProductionController } from "./eggs.controller.js";
 
@@ -19,6 +22,17 @@ router
     validateParams(flockParamsSchema),
     validateBody(createEggProductionSchema),
     catchAsync(EggProductionController.recordEggProduction),
+  )
+  .get(
+    validateParams(flockParamsSchema),
+    catchAsync(EggProductionController.getEggProductionHistory),
+  );
+
+router
+  .route("/:flockId/production/:productionId")
+  .get(
+    validateParams(eggProductionParamSchema),
+    catchAsync(EggProductionController.getEggProduction),
   );
 
 export default router;

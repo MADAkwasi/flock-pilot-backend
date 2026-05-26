@@ -1,3 +1,4 @@
+import { eggProductionListSelect } from "./eggs.constants.js";
 import { feedLogListSelect } from "./feed-log.constant.js";
 import { healthListSelect } from "./health.constant.js";
 import { mortalityListSelect } from "./mortality.constant.js";
@@ -32,12 +33,7 @@ export const flockDetailSelect = {
     select: mortalityListSelect,
   },
   eggs: {
-    select: {
-      id: true,
-      count: true,
-      broken: true,
-      recordedAt: true,
-    },
+    select: eggProductionListSelect,
   },
   health: {
     select: healthListSelect,

@@ -14,5 +14,12 @@ export const updateEggProductionSchema = z
   })
   .strict();
 
+export const eggProductionParamSchema = z
+  .object({
+    flockId: z.uuid(),
+    productionId: z.uuid(),
+  })
+  .strict();
+
 export type EggProductionDto = z.infer<typeof createEggProductionSchema>;
 export type UpdateEggProductionDto = z.infer<typeof updateEggProductionSchema>;
