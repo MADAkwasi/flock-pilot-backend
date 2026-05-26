@@ -55,6 +55,28 @@ enum ExpenseType {
   OTHER
 }
 
+enum InventoryCategory {
+  FEED
+  MEDICATION
+  CRATE
+  EQUIPMENT
+  SUPPLEMENT
+  OTHER
+}
+
+enum InventoryTransactionType {
+  PURCHASE
+  CONSUMPTION
+  ADJUSTMENT
+  LOSS
+}
+
+enum SaleType {
+  BIRD
+  EGG
+  INVENTORY
+}
+
 model User {
   id String @id @default(uuid())
   email String @unique
@@ -77,6 +99,9 @@ model Farm {
   farmType FarmType?
   flocks Flock[]
   expenses Expense[]
+  inventoryItems InventoryItem[]
+  inventoryTransactions InventoryTransaction[]
+  sales Sale[]
   aiLogs AiInteraction[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -101,6 +126,8 @@ model Flock{
   eggs EggProduction[]
   expenses Expense[]
   mortality MortalityRecord[]
+  inventoryTransactions InventoryTransaction[]
+  sales Sale[]
   startDate DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -189,6 +216,84 @@ model FlockNote{
   recordedAt DateTime @default(now())
 
   @@index([flockId, recordedAt])
+}
+
+model InventoryItem {
+  id String @id @default(uuid())
+
+  farmId String
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  name String
+  category InventoryCategory
+  unit String // e.g. "kg", "bags", "boxes"
+
+  quantity Float @default(0)
+  reorderLevel Float?
+
+  costPerUnit Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions InventoryTransaction[]
+
+  @@index([farmId])
+}
+
+model InventoryTransaction {
+  id String @id @default(uuid())
+
+  farmId String
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  flockId String?
+  flock Flock? @relation(fields: [flockId], references: [id], onDelete: SetNull)
+
+  inventoryItemId String
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+
+  type InventoryTransactionType
+
+  quantity Float
+  unitCost Float?
+
+  source String?
+  referenceId String?
+
+  notes String?
+
+  occurredAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@index([farmId, flockId])
+}
+
+model Sale {
+  id String @id @default(uuid())
+
+  farmId String
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  flockId String?
+  flock Flock? @relation(fields: [flockId], references: [id], onDelete: SetNull)
+
+  type SaleType
+
+  quantity Float
+
+  unitPrice Float
+
+  totalAmount Float
+
+  customerName String?
+
+  notes String?
+
+  soldAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@index([farmId, flockId])
 }
 
 model AiInteraction {

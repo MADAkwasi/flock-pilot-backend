@@ -62,4 +62,26 @@ export const flockDetailSelect = {
       occurredAt: true,
     },
   },
+  inventoryTransactions: {
+    select: {
+      id: true,
+      inventoryItem: {
+        select: {
+          name: true,
+          category: true,
+        },
+      },
+      type: true,
+      quantity: true,
+      unitCost: true,
+    },
+  },
+  sales: {
+    select: {
+      id: true,
+      type: true,
+      totalAmount: true,
+      customerName: true,
+    },
+  },
 } as const;
