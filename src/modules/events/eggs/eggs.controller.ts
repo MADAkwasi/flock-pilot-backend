@@ -78,8 +78,7 @@ export class EggProductionController {
 
     res.status(200).json({
       status: "success",
-      message:
-        "Egg production record deleted successfully. Egg inventory updated",
+      message: "Egg production record deleted successfully. Inventory updated",
     });
   }
 
