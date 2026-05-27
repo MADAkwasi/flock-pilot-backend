@@ -1,7 +1,7 @@
 export const feedLogListSelect = {
   id: true,
-  feedType: true,
   quantityKg: true,
+  inventoryItemId: true,
   notes: true,
   recordedAt: true,
 } as const;
