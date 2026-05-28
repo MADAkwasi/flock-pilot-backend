@@ -2,7 +2,7 @@ import type { EggProductionGetPayload } from "../../../generated/prisma/models.j
 import {
   eggProductionDetailSelect,
   eggProductionListSelect,
-} from "../../../constants/eggs.constants.js";
+} from "../../../constants/eggs.constant.js";
 
 export type EggProductionWithListSelect = EggProductionGetPayload<{
   select: typeof eggProductionListSelect;

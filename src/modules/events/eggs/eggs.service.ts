@@ -1,7 +1,7 @@
 import {
   eggProductionDetailSelect,
   eggProductionListSelect,
-} from "../../../constants/eggs.constants.js";
+} from "../../../constants/eggs.constant.js";
 import { prisma } from "../../../db/prisma.js";
 import {
   FlockType,

@@ -1,7 +1,8 @@
-import { eggProductionListSelect } from "./eggs.constants.js";
+import { eggProductionListSelect } from "./eggs.constant.js";
 import { feedLogListSelect } from "./feed-log.constant.js";
 import { healthListSelect } from "./health.constant.js";
 import { mortalityListSelect } from "./mortality.constant.js";
+import { salesListSelect } from "./sales.constant..js";
 
 export const flockListSelect = {
   id: true,
@@ -73,11 +74,6 @@ export const flockDetailSelect = {
     },
   },
   sales: {
-    select: {
-      id: true,
-      type: true,
-      totalAmount: true,
-      customerName: true,
-    },
+    select: salesListSelect,
   },
 } as const;

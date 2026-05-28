@@ -7,7 +7,7 @@ import {
 import {
   createFarmSchema,
   updateFarmBodySchema,
-  farmParamsSchema,
+  farmParamSchema,
 } from "./farm.scheme.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { FarmController } from "./farm.controller.js";
@@ -24,28 +24,28 @@ router.route("/my-farms").get(catchAsync(FarmController.getMyFarms));
 
 router
   .route("/:farmId")
-  .get(validateParams(farmParamsSchema), catchAsync(FarmController.getFarm))
+  .get(validateParams(farmParamSchema), catchAsync(FarmController.getFarm))
   .patch(
-    validateParams(farmParamsSchema),
+    validateParams(farmParamSchema),
     validateBody(updateFarmBodySchema),
     catchAsync(FarmController.updateFarm),
   );
 
 router.get(
   "/:farmId/dashboard",
-  validateParams(farmParamsSchema),
+  validateParams(farmParamSchema),
   catchAsync(FarmController.getFarmDashboard),
 );
 
 router
   .route("/:farmId/deactivate")
   .patch(
-    validateParams(farmParamsSchema),
+    validateParams(farmParamSchema),
     catchAsync(FarmController.deactivate),
   );
 
 router
   .route("/:farmId/activate")
-  .patch(validateParams(farmParamsSchema), catchAsync(FarmController.activate));
+  .patch(validateParams(farmParamSchema), catchAsync(FarmController.activate));
 
 export default router;
