@@ -23,10 +23,5 @@ export const farmParamSchema = z.object({
   farmId: z.uuid(),
 });
 
-// Dedicated param validator
-export const farmParamsSchema = z.object({
-  farmId: z.uuid(),
-});
-
 export type CreateFarmDto = z.infer<typeof createFarmSchema>;
 export type UpdateFarmDto = z.infer<typeof updateFarmBodySchema>;

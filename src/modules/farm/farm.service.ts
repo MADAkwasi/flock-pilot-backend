@@ -150,6 +150,22 @@ class FarmService {
         : 0,
     };
   }
+
+  public async ensureOwnedFarm(farmId: string, ownerId: string) {
+    const farm = await prisma.farm.findFirst({
+      where: {
+        id: farmId,
+        ownerId,
+      },
+      select: { id: true, ownerId: true },
+    });
+
+    if (!farm) {
+      throw new AppError("Farm not found", 404);
+    }
+
+    return farm;
+  }
 }
 
 export const farmService = new FarmService();

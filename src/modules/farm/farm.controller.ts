@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { farmService } from "./farm.service.js";
-import { farmParamsSchema } from "./farm.scheme.js";
+import { farmParamSchema } from "./farm.scheme.js";
 
 export class FarmController {
   static async createFarm(req: Request, res: Response): Promise<void> {
@@ -31,7 +31,7 @@ export class FarmController {
   }
 
   static async getFarm(req: Request, res: Response): Promise<void> {
-    const { farmId } = farmParamsSchema.parse(req.params);
+    const { farmId } = farmParamSchema.parse(req.params);
     const { userId } = req;
 
     const farm = await farmService.getFarmUserById(farmId, userId);
@@ -45,7 +45,7 @@ export class FarmController {
   }
 
   static async updateFarm(req: Request, res: Response): Promise<void> {
-    const { farmId } = farmParamsSchema.parse(req.params);
+    const { farmId } = farmParamSchema.parse(req.params);
     const { body, userId } = req;
 
     const farm = await farmService.updateFarmInfo(farmId, userId, body);
@@ -59,7 +59,7 @@ export class FarmController {
   }
 
   static async deactivate(req: Request, res: Response): Promise<void> {
-    const { farmId } = farmParamsSchema.parse(req.params);
+    const { farmId } = farmParamSchema.parse(req.params);
     const { userId } = req;
 
     await farmService.deactivateFarm(farmId, userId);
@@ -71,7 +71,7 @@ export class FarmController {
   }
 
   static async activate(req: Request, res: Response): Promise<void> {
-    const { farmId } = farmParamsSchema.parse(req.params);
+    const { farmId } = farmParamSchema.parse(req.params);
     const { userId } = req;
 
     const farm = await farmService.activateFarm(farmId, userId);
@@ -86,7 +86,7 @@ export class FarmController {
   }
 
   static async getFarmDashboard(req: Request, res: Response): Promise<void> {
-    const { farmId } = farmParamsSchema.parse(req.params);
+    const { farmId } = farmParamSchema.parse(req.params);
     const { userId } = req;
 
     const dashboard = await farmService.getFarmDashboard(farmId, userId);
