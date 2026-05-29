@@ -26,4 +26,4 @@ export const inventoryItemDetailSelect = {
       notes: true,
     },
   },
-};
+} as const;

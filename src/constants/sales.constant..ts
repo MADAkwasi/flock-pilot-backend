@@ -19,4 +19,4 @@ export const salesDetailSelect = {
       flockType: true,
     },
   },
-};
+} as const;

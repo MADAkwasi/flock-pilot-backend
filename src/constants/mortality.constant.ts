@@ -17,4 +17,4 @@ export const mortalityDetailSelect = {
       initialCount: true,
     },
   },
-};
+} as const;
