@@ -11,6 +11,10 @@ import type { AiInteraction, Prisma } from "../../generated/prisma/client.js";
 import { aiSystemPrompt } from "../../constants/ai-assistant.constant.js";
 import { AiIntent } from "./ai-assistant.type.js";
 import { detectIntentWithLLM } from "../../utils/intent-detection.js";
+import { insightEngineService } from "../../utils/insight-engine/insight-engine.service.js";
+import type { FarmInsight } from "../../utils/insight-engine/insight-engine.type.js";
+import type { FarmPrediction } from "../../utils/prediction-engine/prediction-engine.type.js";
+import { predictionEngineService } from "../../utils/prediction-engine/prediction-engine.service.js";
 
 class AiAssistantService {
   public async askQuestion(
@@ -46,7 +50,16 @@ class AiAssistantService {
 
       const context = await this.buildContextByIntent(tx, farmId, intent);
 
-      console.log(this.formatContext(intent, context));
+      const insights = await insightEngineService.generateInsights(farmId);
+
+      const predictions =
+        await predictionEngineService.generatePredictions(farmId);
+
+      const formattedContext = this.formatContext(intent, context);
+
+      const formattedInsights = this.formatInsights(insights);
+
+      const formattedPredictions = this.formatPredictions(predictions);
 
       const messages = [
         {
@@ -55,7 +68,15 @@ class AiAssistantService {
         },
         {
           role: GropRoles.SYSTEM,
-          content: this.formatContext(intent, context),
+          content: formattedContext,
+        },
+        {
+          role: GropRoles.SYSTEM,
+          content: formattedInsights,
+        },
+        {
+          role: GropRoles.SYSTEM,
+          content: formattedPredictions,
         },
         ...this.mapToGroqMessages(conversationHistory),
       ];
@@ -413,6 +434,52 @@ GENERAL FARM CONTEXT
   ${context.totalSales - context.totalExpenses}
 `;
     }
+  }
+
+  private formatInsights(insights: FarmInsight[]): string {
+    if (insights.length === 0) {
+      return `
+FARM INSIGHTS
+
+- No significant operational issues detected.
+`;
+    }
+
+    return `
+FARM INSIGHTS
+
+${insights
+  .map(
+    (insight) => `
+- [${insight.severity}] ${insight.message}
+`,
+  )
+  .join("\n")}
+`;
+  }
+
+  private formatPredictions(predictions: FarmPrediction[]): string {
+    if (predictions.length === 0) {
+      return `
+FARM PREDICTIONS
+
+- No immediate risks predicted.
+`;
+    }
+
+    return `
+FARM PREDICTIONS
+
+${predictions
+  .map(
+    (p) => `
+- [${p.severity}] ${p.message}
+  Probability: ${(p.probability * 100).toFixed(0)}%
+  Horizon: ${p.horizon}
+`,
+  )
+  .join("\n")}
+`;
   }
 
   private extractCommonHealthIssues(records: any[]) {
