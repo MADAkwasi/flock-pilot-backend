@@ -1,3 +1,4 @@
+import { expensesListSelect } from "./expenses.constant.js";
 import { flockListSelect } from "./flock.constant.js";
 
 export const farmActiveSelect = {
@@ -22,14 +23,7 @@ export const farmDetailSelect = {
     select: flockListSelect,
   },
   expenses: {
-    select: {
-      id: true,
-      type: true,
-      category: true,
-      amount: true,
-      description: true,
-      occurredAt: true,
-    },
+    select: expensesListSelect,
   },
   inventoryItems: {
     select: {

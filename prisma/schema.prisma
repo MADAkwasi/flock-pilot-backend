@@ -47,12 +47,11 @@ enum FlockStatus {
 }
 
 enum ExpenseType {
-  FEED
-  MEDICATION
-  INVENTORY
-  LABOR
-  TRANSPORT
-  OTHER
+  PURCHASE
+  SERVICE
+  MAINTENANCE
+  LOSS
+  ADJUSTMENT
 }
 
 enum InventoryCategory {
@@ -72,12 +71,25 @@ enum InventoryTransactionType {
   LOSS
   PRODUCTION
   SALE
+  REVERSAL  
 }
 
 enum SaleType {
   BIRD
   EGG
   INVENTORY
+}
+
+enum ExpenseCategory {
+  FEED
+  MEDICATION
+  INVENTORY
+  LABOR
+  TRANSPORT
+  EQUIPMENT
+  UTILITIES
+  MAINTENANCE
+  OTHER
 }
 
 model User {
@@ -147,14 +159,16 @@ model Expense {
   flockId String?
   flock Flock? @relation(fields: [flockId], references: [id], onDelete: SetNull)
 
+  inventoryItemId String?
+  inventoryItem InventoryItem? @relation(fields: [inventoryItemId], references: [id], onDelete: SetNull)
+
   type ExpenseType
-  category String
+  category ExpenseCategory
 
   amount Float
 
   description String?
 
-  occurredAt DateTime
   createdAt DateTime @default(now())
 
   @@index([flockId, farmId])
@@ -232,6 +246,7 @@ model InventoryItem {
   category InventoryCategory
   unit String // e.g. "kg", "bags", "boxes"
   feedLog FeedLog[]
+  expense Expense[]
 
   reorderLevel Float?
 
