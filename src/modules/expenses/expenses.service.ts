@@ -23,13 +23,13 @@ class ExpenseService {
     ownerId: string,
     flockId?: string,
   ): Promise<ExpensesWithListSelect[]> {
-    const farm = await farmService.ensureOwnedFarm(farmId, ownerId);
+    await farmService.ensureOwnedFarm(farmId, ownerId);
 
     if (flockId) {
       const flock = await prisma.flock.findFirst({
         where: {
           id: flockId,
-          farmId: farm.id,
+          farmId,
         },
       });
 
@@ -38,7 +38,7 @@ class ExpenseService {
 
     return prisma.expense.findMany({
       where: {
-        farmId: farm.id,
+        farmId,
         ...(flockId && { flockId }),
       },
       select: expensesListSelect,
@@ -53,12 +53,12 @@ class ExpenseService {
     ownerId: string,
     expenseId: string,
   ): Promise<ExpensesWithDetailSelect> {
-    const farm = await farmService.ensureOwnedFarm(farmId, ownerId);
+    await farmService.ensureOwnedFarm(farmId, ownerId);
 
     const expense = await prisma.expense.findFirst({
       where: {
         id: expenseId,
-        farmId: farm.id,
+        farmId,
       },
       select: expensesDetailSelect,
     });
@@ -171,11 +171,11 @@ class ExpenseService {
     expenseId: string,
     data: UpdateExpenseDto,
   ): Promise<ExpensesWithDetailSelect> {
-    const farm = await farmService.ensureOwnedFarm(farmId, ownerId);
+    await farmService.ensureOwnedFarm(farmId, ownerId);
 
     return prisma.$transaction(async (tx) => {
       const existing = await tx.expense.findFirst({
-        where: { id: expenseId, farmId: farm.id },
+        where: { id: expenseId, farmId },
       });
 
       if (!existing) {
@@ -226,11 +226,11 @@ class ExpenseService {
     ownerId: string,
     expenseId: string,
   ): Promise<boolean> {
-    const farm = await farmService.ensureOwnedFarm(farmId, ownerId);
+    await farmService.ensureOwnedFarm(farmId, ownerId);
 
     return prisma.$transaction(async (tx) => {
       const expense = await tx.expense.findFirst({
-        where: { id: expenseId, farmId: farm.id },
+        where: { id: expenseId, farmId },
       });
 
       if (!expense) {

@@ -72,6 +72,7 @@ enum InventoryTransactionType {
   PRODUCTION
   SALE
   REVERSAL  
+  OPENING_BALANCE
 }
 
 enum SaleType {
@@ -247,6 +248,9 @@ model InventoryItem {
   unit String // e.g. "kg", "bags", "boxes"
   feedLog FeedLog[]
   expense Expense[]
+  transactions InventoryTransaction[]
+  
+  isDeleted Boolean @default(false)
 
   reorderLevel Float?
 
@@ -255,9 +259,9 @@ model InventoryItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  transactions InventoryTransaction[]
 
   @@index([farmId])
+  @@unique([farmId, name, category])
 }
 
 model InventoryTransaction {
