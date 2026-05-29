@@ -16,4 +16,4 @@ export const expensesDetailSelect = {
       breed: true,
     },
   },
-};
+} as const;

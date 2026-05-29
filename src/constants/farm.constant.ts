@@ -4,7 +4,7 @@ import { flockListSelect } from "./flock.constant.js";
 export const farmActiveSelect = {
   isActive: true,
   updatedAt: true,
-};
+} as const;
 
 export const farmListSelect = {
   id: true,
@@ -38,6 +38,7 @@ export const farmDetailSelect = {
       id: true,
       inventoryItem: {
         select: {
+          id: true,
           name: true,
           category: true,
         },
@@ -55,4 +56,4 @@ export const farmDetailSelect = {
       customerName: true,
     },
   },
-};
+} as const;

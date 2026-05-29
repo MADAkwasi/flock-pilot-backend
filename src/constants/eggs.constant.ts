@@ -16,4 +16,4 @@ export const eggProductionDetailSelect = {
       currentCount: true,
     },
   },
-};
+} as const;

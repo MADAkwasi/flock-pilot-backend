@@ -58,6 +58,7 @@ export const flockDetailSelect = {
       id: true,
       inventoryItem: {
         select: {
+          id: true,
           name: true,
           category: true,
         },
