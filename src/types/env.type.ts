@@ -3,4 +3,5 @@ export interface EnvConfig {
   PORT: number;
   JWT_SECRET: string;
   NODE_ENV: string;
+  GROQ_API_KEY: string;
 }
