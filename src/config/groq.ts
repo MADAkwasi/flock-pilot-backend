@@ -7,7 +7,7 @@ export enum GropRoles {
   SYSTEM = "system",
 }
 
-const client = new Groq({
+export const client = new Groq({
   apiKey: env.GROQ_API_KEY,
 });
 
