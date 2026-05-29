@@ -15,6 +15,7 @@ import feedLogRouter from "./modules/events/feed-log/feed-log.route.js";
 import eggRouter from "./modules/events/eggs/eggs.route.js";
 import noteRouter from "./modules/events/notes/notes.route.js";
 import saleRouter from "./modules/sales/sales.route.js";
+import expensesRouter from "./modules/expenses/expenses.route.js";
 import morgan from "morgan";
 import { env } from "./config/env.js";
 import { globalErrorHandler } from "./utils/errorController.js";
@@ -38,6 +39,7 @@ app.use("/api/v1/mortality-records", mortalityRouter);
 app.use("/api/v1/egg-productions", eggRouter);
 app.use("/api/v1/notes", noteRouter);
 app.use("/api/v1/sales", saleRouter);
+app.use("/api/v1/expenses", expensesRouter);
 
 app.all("/{*splat}", (req: Request, _: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
