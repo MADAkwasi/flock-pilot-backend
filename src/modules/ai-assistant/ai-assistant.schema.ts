@@ -6,6 +6,7 @@ export const askAssistantSchema = z.object({
     .trim()
     .min(1, "Message is required")
     .max(2000, "Message is too long"),
+  conversationId: z.ulid().optional(),
 });
 
 export type AskAssistantDto = z.infer<typeof askAssistantSchema>;

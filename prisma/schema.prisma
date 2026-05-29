@@ -27,6 +27,7 @@ enum Severity {
 enum AiRole {
   USER
   ASSISTANT
+  SYSTEM
 }
 
 enum FarmType {
@@ -100,6 +101,7 @@ model User {
   name String
   role UserRole @default(FARMER)
   farms Farm[]
+  aiLogs AiInteraction[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -322,6 +324,9 @@ model AiInteraction {
   id String @id @default(ulid())
   farmId String
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String
   role AiRole
   message String
   metadata Json?
