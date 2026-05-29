@@ -2,6 +2,7 @@ export const inventoryTransactionsListSelect = {
   id: true,
   inventoryItem: {
     select: {
+      id: true,
       name: true,
       category: true,
     },

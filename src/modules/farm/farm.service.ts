@@ -160,9 +160,7 @@ class FarmService {
       select: { id: true, ownerId: true },
     });
 
-    if (!farm) {
-      throw new AppError("Farm not found", 404);
-    }
+    if (!farm) throw new AppError("Farm not found", 404);
 
     return farm;
   }

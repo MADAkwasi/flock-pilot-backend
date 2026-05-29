@@ -38,6 +38,7 @@ export const farmDetailSelect = {
       id: true,
       inventoryItem: {
         select: {
+          id: true,
           name: true,
           category: true,
         },
