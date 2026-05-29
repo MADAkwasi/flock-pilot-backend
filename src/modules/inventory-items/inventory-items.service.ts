@@ -29,6 +29,35 @@ class InventoryItemService {
     await farmService.ensureOwnedFarm(farmId, ownerId);
 
     return prisma.$transaction(async (tx) => {
+      const existingActive = await tx.inventoryItem.findFirst({
+        where: {
+          farmId,
+          name: data.name,
+          category: data.category,
+          isDeleted: false,
+        },
+      });
+
+      if (existingActive) {
+        throw new AppError("Inventory item already exists", 409);
+      }
+
+      const existingArchived = await tx.inventoryItem.findFirst({
+        where: {
+          farmId,
+          name: data.name,
+          category: data.category,
+          isDeleted: true,
+        },
+      });
+
+      if (existingArchived) {
+        throw new AppError(
+          "This item exists but is archived. Please restore it instead.",
+          409,
+        );
+      }
+
       const inventoryItem = await tx.inventoryItem.create({
         data: {
           farmId,
@@ -131,16 +160,24 @@ class InventoryItemService {
 
     const item = await prisma.inventoryItem.findFirst({
       where: { id: itemId, farmId },
-      include: {
-        transactions: true,
-      },
     });
 
     if (!item) throw new AppError("Inventory item not found", 404);
 
-    if (item.transactions.length > 0) {
+    const NON_BLOCKING_TYPES = [InventoryTransactionType.OPENING_BALANCE];
+
+    const blockingTx = await prisma.inventoryTransaction.findFirst({
+      where: {
+        inventoryItemId: itemId,
+        type: {
+          notIn: NON_BLOCKING_TYPES,
+        },
+      },
+    });
+
+    if (blockingTx) {
       throw new AppError(
-        "Cannot delete inventory item with transaction history. Archive it instead.",
+        "Cannot delete inventory item with operational history. Archive it instead.",
         400,
       );
     }
@@ -287,6 +324,29 @@ class InventoryItemService {
           notes: reason,
         },
       });
+    });
+  }
+
+  public async restoreInventoryItem(
+    farmId: string,
+    ownerId: string,
+    itemId: string,
+  ) {
+    await farmService.ensureOwnedFarm(farmId, ownerId);
+
+    const item = await prisma.inventoryItem.findFirst({
+      where: { id: itemId, farmId },
+    });
+
+    if (!item) throw new AppError("Inventory item not found", 404);
+
+    if (!item.isDeleted) throw new AppError("Item is already active", 400);
+
+    return prisma.inventoryItem.update({
+      where: { id: itemId },
+      data: {
+        isDeleted: false,
+      },
     });
   }
 }

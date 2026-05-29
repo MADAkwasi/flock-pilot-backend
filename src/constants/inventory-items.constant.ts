@@ -23,7 +23,7 @@ export const inventoryItemDetailSelect = {
     select: {
       type: true,
       quantity: true,
-      note: true,
+      notes: true,
     },
   },
 };

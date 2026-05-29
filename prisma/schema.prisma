@@ -261,6 +261,7 @@ model InventoryItem {
 
 
   @@index([farmId])
+  @@unique([farmId, name, category])
 }
 
 model InventoryTransaction {

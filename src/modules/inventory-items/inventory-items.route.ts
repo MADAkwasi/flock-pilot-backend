@@ -63,4 +63,25 @@ router
     catchAsync(InventoryItemController.clearInventoryStock),
   );
 
+router
+  .route("/:farmId/item/:inventoryItemId/get-stock")
+  .get(
+    validateParams(inventoryItemParamSchema),
+    catchAsync(InventoryItemController.getStock),
+  );
+
+router
+  .route("/:farmId/item/:inventoryItemId/archive")
+  .patch(
+    validateParams(inventoryItemParamSchema),
+    catchAsync(InventoryItemController.archiveItem),
+  );
+
+router
+  .route("/:farmId/item/:inventoryItemId/restore")
+  .patch(
+    validateParams(inventoryItemParamSchema),
+    catchAsync(InventoryItemController.restoreItem),
+  );
+
 export default router;

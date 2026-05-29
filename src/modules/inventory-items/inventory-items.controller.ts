@@ -157,4 +157,58 @@ export class InventoryItemController {
       message: "Inventory stock adjusted successfully",
     });
   }
+
+  public static async getStock(req: Request, res: Response): Promise<void> {
+    const { userId } = req;
+    const { farmId, inventoryItemId } = inventoryItemParamSchema.parse(
+      req.params,
+    );
+
+    const stock = await inventoryItemService.getCurrentStock(
+      farmId,
+      userId,
+      inventoryItemId,
+    );
+
+    res.status(200).json({
+      status: "success",
+      stock,
+    });
+  }
+
+  public static async archiveItem(req: Request, res: Response): Promise<void> {
+    const { userId } = req;
+    const { farmId, inventoryItemId } = inventoryItemParamSchema.parse(
+      req.params,
+    );
+
+    await inventoryItemService.archiveInventoryItem(
+      farmId,
+      userId,
+      inventoryItemId,
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Item has been archived",
+    });
+  }
+
+  public static async restoreItem(req: Request, res: Response): Promise<void> {
+    const { userId } = req;
+    const { farmId, inventoryItemId } = inventoryItemParamSchema.parse(
+      req.params,
+    );
+
+    await inventoryItemService.restoreInventoryItem(
+      farmId,
+      userId,
+      inventoryItemId,
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Item restored successfully",
+    });
+  }
 }
