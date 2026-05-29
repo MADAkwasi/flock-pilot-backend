@@ -20,4 +20,5 @@ export const env: EnvConfig = {
   DATABASE_URL: process.env.DATABASE_URL ?? "",
   JWT_SECRET: process.env.JWT_SECRET ?? "",
   NODE_ENV: process.env.NODE_ENV ?? "development",
+  GROQ_API_KEY: process.env.GROQ_API_KEY ?? "",
 };
