@@ -5,6 +5,7 @@ import express, {
   type Request,
   type NextFunction,
 } from "express";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./modules/auth/auth.route.js";
 import farmRouter from "./modules/farm/farm.route.js";
@@ -31,6 +32,12 @@ if (env.NODE_ENV === "development") app.use(morgan("dev"));
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: true,
+  }),
+);
 
 const { PORT } = env;
 
