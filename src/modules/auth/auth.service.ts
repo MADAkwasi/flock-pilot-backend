@@ -9,14 +9,18 @@ import { prisma } from "../../db/prisma.js";
 import { env } from "../../config/env.js";
 import type { SafeUserWithFarms } from "../../types/user.type.js";
 import { safeUserWithFarmSelect } from "../../constants/user.constant.js";
+import type { User } from "../../generated/prisma/client.js";
+import AppError from "../../utils/appError.js";
 
 class AuthService {
-  public async registerUser(userData: RegisterDto): Promise<string> {
+  public async registerUser(
+    userData: RegisterDto,
+  ): Promise<{ token: string; user: User }> {
     const { name, email, password } = userData;
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const newUser = await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         name,
         email,
@@ -24,12 +28,14 @@ class AuthService {
       },
     });
 
-    const token = this.signToken(newUser.id);
+    const token = this.signToken(user.id);
 
-    return token;
+    return { token, user };
   }
 
-  public async loginUser(userData: LoginDto): Promise<string | null> {
+  public async loginUser(
+    userData: LoginDto,
+  ): Promise<{ token: string; user: User }> {
     const { email, password } = userData;
 
     const user = await prisma.user.findUnique({
@@ -38,29 +44,30 @@ class AuthService {
       },
     });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) return null;
+    if (!user || !(await bcrypt.compare(password, user.password)))
+      throw new AppError("Invalid Credentials", 401);
 
     const token = this.signToken(user.id);
 
-    return token;
+    return { token, user };
   }
 
   public async updateUserPassword(
     id: string,
     userData: updatePasswordDto,
-  ): Promise<string | null> {
+  ): Promise<string> {
     const { currentPassword, newPassword } = userData;
 
     const user = await prisma.user.findUnique({ where: { id } });
 
-    if (!user) return null;
+    if (!user) throw new AppError("User not found", 404);
 
     const isCurrentPasswordValid = await bcrypt.compare(
       currentPassword,
       user.password,
     );
 
-    if (!isCurrentPasswordValid) return null;
+    if (!isCurrentPasswordValid) throw new AppError("Incorrect password", 400);
 
     const hashPassword = await bcrypt.hash(newPassword, 12);
 
@@ -80,7 +87,7 @@ class AuthService {
       select: safeUserWithFarmSelect,
     });
 
-    if (!user) return null;
+    if (!user) throw new AppError("User not found", 404);
 
     return user;
   }
