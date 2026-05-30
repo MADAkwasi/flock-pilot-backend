@@ -13,8 +13,11 @@ export class AuthController {
     });
 
     res.status(201).json({
+      status: "success",
       token,
-      user,
+      data: {
+        user,
+      },
     });
   }
 
@@ -24,8 +27,11 @@ export class AuthController {
     const { token, user } = await authService.loginUser({ email, password });
 
     res.status(200).json({
+      status: "success",
       token,
-      user,
+      data: {
+        user,
+      },
     });
   }
 
