@@ -66,7 +66,7 @@ class FarmAnalyticsService {
       prisma.expense.aggregate({
         where: {
           farmId,
-          occurredAt: { gte: startOfMonth },
+          createdAt: { gte: startOfMonth },
         },
         _sum: { amount: true },
       }),
@@ -74,7 +74,7 @@ class FarmAnalyticsService {
       prisma.expense.aggregate({
         where: {
           farmId,
-          occurredAt: {
+          createdAt: {
             gte: startOfLastMonth,
             lt: startOfMonth,
           },

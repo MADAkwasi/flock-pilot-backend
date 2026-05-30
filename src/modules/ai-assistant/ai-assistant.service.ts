@@ -11,10 +11,10 @@ import type { AiInteraction, Prisma } from "../../generated/prisma/client.js";
 import { aiSystemPrompt } from "../../constants/ai-assistant.constant.js";
 import { AiIntent } from "./ai-assistant.type.js";
 import { detectIntentWithLLM } from "../../utils/intent-detection.js";
-import { insightEngineService } from "../../utils/insight-engine/insight-engine.service.js";
-import type { FarmInsight } from "../../utils/insight-engine/insight-engine.type.js";
-import type { FarmPrediction } from "../../utils/prediction-engine/prediction-engine.type.js";
-import { predictionEngineService } from "../../utils/prediction-engine/prediction-engine.service.js";
+import { insightEngineService } from "../analytics/insight-engine/insight-engine.service.js";
+import type { FarmInsight } from "../analytics/insight-engine/insight-engine.type.js";
+import type { FarmPrediction } from "../analytics/prediction-engine/prediction-engine.type.js";
+import { predictionEngineService } from "../analytics/prediction-engine/prediction-engine.service.js";
 
 class AiAssistantService {
   public async askQuestion(

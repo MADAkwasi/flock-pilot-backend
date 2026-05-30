@@ -1,4 +1,4 @@
-import { farmAnalyticsService } from "../farm-analytics.js";
+import { farmAnalyticsService } from "../../../utils/farm-analytics.js";
 import {
   PredictionSeverity,
   type FarmPrediction,

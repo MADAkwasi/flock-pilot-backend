@@ -1,4 +1,4 @@
-import { farmAnalyticsService } from "../farm-analytics.js";
+import { farmAnalyticsService } from "../../../utils/farm-analytics.js";
 import { InsightSeverity, type FarmInsight } from "./insight-engine.type.js";
 
 class InsightEngineService {
