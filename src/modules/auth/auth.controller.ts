@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import { authService } from "./auth.service.js";
-import AppError from "../../utils/appError.js";
 
 export class AuthController {
   static async signUpUser(req: Request, res: Response): Promise<void> {
