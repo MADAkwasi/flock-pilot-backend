@@ -1,27 +1,27 @@
 # 🐔 FlockPilot Backend
 
-FlockPilot is a smart poultry farm management and AI-assisted decision system designed to help farmers monitor, manage, and optimize poultry operations using real-time data, automation, and intelligent insights.
+FlockPilot is an intelligent poultry farm management platform built to help farmers manage operations, monitor flock performance, track inventory, analyze farm health, and receive AI-assisted operational insights.
 
-This repository contains the **backend API service** built with TypeScript, Express, Prisma, and PostgreSQL.
+This repository contains the backend API service powering the FlockPilot ecosystem.
 
 ---
 
-# 🚀 Vision
+# 🚀 Overview
 
-FlockPilot is designed to evolve into a full-scale agricultural intelligence platform that provides:
+FlockPilot combines operational farm management with analytics and AI-powered assistance to create a modern agricultural intelligence system.
 
-- Smart poultry farm management
-- AI-assisted farming insights (feeding, health, productivity)
-- Real-time monitoring of flock performance
-- Multi-farm and multi-user management
-- Role-based access control (Farmers, Admins, Assistants)
-- Scalable analytics for farm optimization
+The backend currently supports:
 
-The backend is built to support both:
+- Multi-farm management
+- Flock lifecycle tracking
+- Inventory and stock movement management
+- Expense and sales tracking
+- Egg production and mortality monitoring
+- AI-assisted farm conversations
+- Insight and prediction engines
+- Analytics-ready dashboard APIs
 
-- A mobile-first farmer application
-- A web-based admin and analytics dashboard
-- AI integrations for conversational farm assistance
+The architecture is designed to scale into a full agricultural operations platform.
 
 ---
 
@@ -32,143 +32,310 @@ The backend is built to support both:
 - **Language:** TypeScript
 - **ORM:** Prisma ORM
 - **Database:** PostgreSQL
-- **Authentication:** JWT (cookie-based + token-based support)
+- **Authentication:** JWT Authentication
 - **Validation:** Zod
-- **Security:** bcrypt password hashing, HTTP-only cookies
-- **Dev Tools:** tsx / ts-node-dev (depending on setup)
+- **AI Integration:** Groq LLM API
+- **Password Security:** bcrypt
+- **Package Manager:** pnpm
+
+---
+
+# 🧠 Core Features
+
+## 🔐 Authentication & Authorization
+
+- User registration
+- Secure login
+- JWT-based authentication
+- Password hashing with bcrypt
+- Protected route middleware
+- Role-based architecture (extensible)
+
+---
+
+## 🏡 Farm Management
+
+Farm owners can:
+
+- Create and manage farms
+- Track farm-wide operational data
+- Manage multiple flocks
+- Access farm analytics and AI insights
+
+---
+
+## 🐔 Flock Management
+
+Track and manage poultry flocks including:
+
+- Flock type (broiler/layer)
+- Bird counts
+- Flock lifecycle status
+- Mortality records
+- Health records
+- Feed logs
+- Egg production
+- Flock notes
+
+---
+
+## 📦 Inventory Management
+
+Advanced inventory management system with transaction-based stock tracking.
+
+### Features
+
+- Inventory item creation
+- Opening stock support
+- Stock adjustments
+- Stock clearing
+- Inventory archiving
+- Transaction history tracking
+- Low-stock monitoring
+- Reorder-level support
+
+### Transaction Types
+
+- PURCHASE
+- CONSUMPTION
+- ADJUSTMENT
+- LOSS
+- PRODUCTION
+- SALE
+- REVERSAL
+- OPENING_BALANCE
+
+The system uses inventory transactions as the source of truth for stock computation.
+
+---
+
+## 💸 Financial Management
+
+### Expense Tracking
+
+Track operational expenses including:
+
+- Feed purchases
+- Medication
+- Equipment
+- Labor
+- Maintenance
+- Transport
+- Utilities
+
+### Sales Tracking
+
+Track farm revenue from:
+
+- Bird sales
+- Egg sales
+- Inventory sales
+
+The system automatically supports operational profitability calculations.
+
+---
+
+# 🤖 AI Assistant System
+
+FlockPilot includes a context-aware AI assistant powered by Groq LLM APIs.
+
+The assistant can:
+
+- Answer operational farm questions
+- Analyze farm performance
+- Detect operational risks
+- Understand farm-specific context
+- Use historical conversation memory
+- Provide inventory, health, finance, and flock insights
+
+---
+
+# 🧠 AI Context Injection
+
+The assistant dynamically injects farm-aware context including:
+
+- Inventory health
+- Financial summaries
+- Flock performance
+- Mortality trends
+- Health records
+- Operational analytics
+- Predictive warnings
+
+Intent-aware context building ensures the AI only receives relevant operational data.
+
+---
+
+# 📊 Analytics System
+
+The backend exposes analytics endpoints designed for dashboard and chart integration.
+
+## Farm Overview Analytics
+
+Includes:
+
+- Total birds
+- Active flocks
+- Mortality rate
+- Financial summaries
+- Profit margins
+- Inventory risk detection
+- Production statistics
+- Operational risks
+
+## Trend Analytics
+
+Supports chart-ready trend data for:
+
+- Egg production
+- Mortality
+- Feed consumption
+- Expenses
+
+---
+
+# 🚨 Insight Engine
+
+The insight engine detects operational anomalies and farm risks such as:
+
+- Mortality spikes
+- Production drops
+- Inventory shortages
+- Expense spikes
+
+These insights are used by both the dashboard and AI assistant.
+
+---
+
+# 🔮 Prediction Engine
+
+The prediction engine provides lightweight predictive analysis including:
+
+- Mortality risk forecasting
+- Egg production decline prediction
+- Feed shortage prediction
+- Inventory stockout forecasting
+- Expense overrun detection
 
 ---
 
 # 📁 Project Structure
 
-```
+```txt
 src/
-├── config/            # Environment & app configuration
-├── db/                # Prisma client setup
-├── middleware/        # Auth, validation, error handling
+├── config/                  # App & environment configuration
+├── db/                      # Prisma database client
+├── generated/               # Generated Prisma client
+├── lib/                     # External integrations (Groq, JWT, etc.)
+├── middleware/              # Auth, validation, error handling
 ├── modules/
-│   ├── user/          # User domain (auth, profile, roles)
-│   ├── auth/          # Authentication logic
-│   └── farm/          # (planned) farm management module
-├── utils/             # Helper utilities
-├── app.ts             # Express app setup
-└── server.ts          # Entry point
+│   ├── auth/
+│   ├── user/
+│   ├── farm/
+│   ├── flock/
+│   ├── inventory/
+│   ├── inventory-transaction/
+│   ├── expense/
+│   ├── sales/
+│   ├── analytics/
+│   ├── ai-assistant/
+│   └── insights/
+├── utils/                   # Shared utilities & analytics helpers
+├── app.ts
+└── server.ts
 ```
 
 ---
 
-# 🔐 Authentication Flow
+# 🗄️ Database Design
 
-The system uses JWT-based authentication:
+The backend uses PostgreSQL with Prisma ORM and is modeled around operational farm relationships.
 
-1. User signs up or logs in
-2. Password is hashed using bcrypt
-3. JWT is generated and stored in HTTP-only cookies
-4. Protected routes validate token via middleware
-5. User context is injected into request pipeline
+Key domain models include:
 
----
-
-# 🧠 Core Domain Models (Planned + Current)
-
-## User
-
-- Authentication identity
-- Roles: FARMER, ADMIN (extensible)
-- Can own multiple farms
-
-## Farm (Planned)
-
-- Belongs to a user
-- Contains multiple flocks
-- Tracks operational data
-
-## Flock (Planned)
-
-- Represents a group of chickens
-- Tracks health, mortality, feed consumption
-
-## Feed & Health Records (Planned)
-
-- Daily tracking of feed usage
-- Medical and vaccination records
-
-## AI Assistant Layer (Planned)
-
-- Context-aware farm assistant
-- Uses historical farm data
-- Provides recommendations and alerts
+- User
+- Farm
+- Flock
+- InventoryItem
+- InventoryTransaction
+- Expense
+- Sale
+- FeedLog
+- HealthRecord
+- EggProduction
+- MortalityRecord
+- AiInteraction
 
 ---
 
-# 🧾 API Features
+# 🧾 API Highlights
 
-## Auth
+## Authentication
 
-- Signup
-- Login
-- Password update
-- JWT-based session management
-
-## User
-
-- Create user
-- Get profile
-- Update password
-- Role management (planned)
-
-## Farm Management (Planned)
-
-- Create farm
-- Assign flocks
-- Track farm performance
+```http
+POST /auth/register
+POST /auth/login
+GET /auth/me
+```
 
 ---
 
-# 🛡️ Error Handling
+## Farm Analytics
 
-A centralized error handling system supports:
-
-- Zod validation errors
-- Authentication errors (JWT)
-- Database constraint errors (Prisma)
-- Custom application errors
-- Global fallback error handler
+```http
+GET /farms/:farmId/analytics/overview
+GET /farms/:farmId/analytics/trends
+```
 
 ---
 
-# 🧪 Validation
+## AI Assistant
 
-All incoming requests are validated using Zod schemas:
+```http
+POST /farms/:farmId/ai-assistant/chat
+```
+
+Supports:
+
+- conversation memory
+- context-aware responses
+- operational intelligence
+
+---
+
+# 🛡️ Validation & Error Handling
+
+The backend includes centralized validation and error handling systems.
+
+### Validation
+
+Powered by Zod:
 
 - Request body validation
-- Params validation (planned expansion)
-- Query validation (planned expansion)
+- Params validation
+- Query validation
 
-Ensures type safety across the entire request lifecycle.
+### Error Handling
 
----
+Handles:
 
-# 🗄️ Database
-
-Powered by PostgreSQL via Prisma ORM.
-
-Key features:
-
-- Type-safe database queries
-- Auto-generated migrations
-- Schema-driven development
-- Relational modeling for farms, users, and flock data
+- Prisma errors
+- Zod validation errors
+- Authentication errors
+- Business logic errors
+- Global fallback errors
 
 ---
 
-# 🔐 Security Considerations
+# 🔐 Security
 
-- Passwords hashed with bcrypt
-- JWT stored in HTTP-only cookies
-- Protected route middleware (planned expansion)
-- Input validation via Zod
-- Duplicate prevention via DB constraints
+- Password hashing with bcrypt
+- JWT authentication
+- HTTP-only cookie support
+- Protected route middleware
+- Input validation
+- Duplicate inventory prevention
+- Multi-tenant farm ownership validation
 
 ---
 
@@ -176,92 +343,102 @@ Key features:
 
 Create a `.env` file:
 
-```
+```env
 DATABASE_URL="postgresql://..."
 JWT_SECRET="your_secret"
+GROQ_API_KEY="your_groq_key"
 PORT=8000
 NODE_ENV=development
 ```
 
 ---
 
-# 🧑‍💻 Development Setup
+# 🧪 Development Setup
+
+## Install dependencies
 
 ```bash
-# install dependencies
 pnpm install
+```
 
-# run dev server
+---
+
+## Run development server
+
+```bash
 pnpm dev
 ```
 
 ---
 
-# 🧱 Database Setup
+# 🗄️ Prisma Setup
+
+## Generate Prisma client
 
 ```bash
-# generate Prisma client
 pnpm prisma generate
+```
 
-# run migrations
+## Run migrations
+
+```bash
 pnpm prisma migrate dev
+```
+
+## Seed database
+
+```bash
+pnpm prisma db seed
 ```
 
 ---
 
-# 🧭 Roadmap
+# 🧭 Current System Architecture
 
-## Phase 1 (Current)
-
-- User authentication
-- JWT system
-- Basic user service
-- Validation layer
-- Error handling system
-
-## Phase 2
-
-- Farm management module
-- Flock tracking system
-- Feed and health logging
-
-## Phase 3
-
-- AI assistant integration (Groq / LLM API)
-- Context-aware recommendations
-- Smart alerts system
-
-## Phase 4
-
-- Real-time analytics dashboard
-- Mobile app integration
-- Multi-farm scaling
+```txt
+Operational Data
+        ↓
+Analytics Layer
+        ↓
+Insight Engine
+        ↓
+Prediction Engine
+        ↓
+AI Context Injection
+        ↓
+AI Assistant Responses
+```
 
 ---
 
-# 🤖 AI Integration (Future Vision)
+# 📈 Future Roadmap
 
-FlockPilot will integrate an AI assistant that can:
+## Planned Improvements
 
-- Analyze farm performance trends
-- Suggest feeding adjustments
-- Predict disease risk patterns
-- Answer farmer questions in natural language
-- Provide operational insights using historical data
+- Notification system
+- Real-time updates
+- Scheduled AI summaries
+- Advanced predictive analytics
+- Multi-user farm collaboration
+- Assistant action execution
+- Mobile push notifications
+- Offline-first mobile support
+- Farm benchmarking analytics
 
 ---
 
-# 📌 Notes
+# 📌 Design Philosophy
 
-This backend is intentionally designed to:
+FlockPilot is intentionally designed to:
 
 - remain modular and scalable
-- support future AI expansion
-- handle multi-tenant farm systems
+- support AI-native workflows
+- model real farm operations
+- provide actionable intelligence
 - evolve into a production-grade agri-tech platform
 
 ---
 
 # 📄 License
 
-Private project — all rights reserved (for now).
+Private project — all rights reserved.
