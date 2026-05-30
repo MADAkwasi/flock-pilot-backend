@@ -179,10 +179,6 @@ class AnalyticsService {
     };
   }
 
-  // -----------------------------
-  // TREND ENDPOINT (UNCHANGED)
-  // -----------------------------
-
   public async getTrends(farmId: string, ownerId: string) {
     await farmService.ensureOwnedFarm(farmId, ownerId);
 
@@ -200,6 +196,8 @@ class AnalyticsService {
       expenses,
     };
   }
+
+  
 }
 
 export const analyticsService = new AnalyticsService();

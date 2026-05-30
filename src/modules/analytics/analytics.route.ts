@@ -3,6 +3,7 @@ import { validateParams } from "../../middleware/validator.middleware.js";
 import { farmParamSchema } from "../farm/farm.scheme.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { AnalyticsController } from "./analytics.controller.js";
+import { DashboardSummaryController } from "./dashboard-summary/dashboard-summary.controller.js";
 
 const router: Router = Router();
 
@@ -32,6 +33,13 @@ router
   .get(
     validateParams(farmParamSchema),
     catchAsync(AnalyticsController.getPredictions),
+  );
+
+router
+  .route("/:farmId/dashboard-summary")
+  .get(
+    validateParams(farmParamSchema),
+    catchAsync(DashboardSummaryController.getDashboardSummary),
   );
 
 export default router;
