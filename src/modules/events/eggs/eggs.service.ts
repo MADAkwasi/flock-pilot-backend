@@ -35,11 +35,6 @@ class EggProductionService {
       );
     }
 
-    const validEggCount = Math.max(
-      0,
-      productionData.count - (productionData.broken ?? 0),
-    );
-
     return prisma.$transaction(async (tx) => {
       const eggProduction = await tx.eggProduction.create({
         data: {
@@ -66,6 +61,11 @@ class EggProductionService {
         });
       }
 
+      const validEggCount = Math.max(
+        0,
+        productionData.count - (productionData.broken ?? 0),
+      );
+
       await tx.inventoryTransaction.create({
         data: {
           farmId,
@@ -74,6 +74,15 @@ class EggProductionService {
           type: InventoryTransactionType.PRODUCTION,
           quantity: validEggCount,
           notes: "Egg production recorded",
+        },
+      });
+
+      await tx.flock.update({
+        where: { id: flockId },
+        data: {
+          eggsLaid: {
+            increment: validEggCount,
+          },
         },
       });
 
@@ -159,6 +168,15 @@ class EggProductionService {
         },
       });
 
+      await tx.flock.update({
+        where: { id: flockId },
+        data: {
+          eggsLaid: {
+            decrement: validEggCount,
+          },
+        },
+      });
+
       await tx.eggProduction.delete({
         where: {
           id: eggProduction.id,
@@ -226,6 +244,15 @@ class EggProductionService {
             type: InventoryTransactionType.ADJUSTMENT,
             quantity: delta,
             notes: "Adjustment from egg production update",
+          },
+        });
+
+        await tx.flock.update({
+          where: { id: flockId },
+          data: {
+            eggsLaid: {
+              increment: delta,
+            },
           },
         });
       }

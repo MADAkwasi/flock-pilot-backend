@@ -16,6 +16,7 @@ export class EggProductionController {
 
     res.status(201).json({
       status: "success",
+      message: "Egg production recorded successfully",
       data: {
         eggs: eggProduction,
       },
@@ -100,6 +101,7 @@ export class EggProductionController {
 
     res.status(200).json({
       status: "success",
+      message: "Egg production updated successfully",
       data: {
         egg: eggProduction,
       },

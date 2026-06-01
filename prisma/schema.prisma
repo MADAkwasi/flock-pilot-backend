@@ -140,6 +140,8 @@ model Flock{
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
   notes FlockNote[]
   feed FeedLog[]
+  eggsLaid Int @default(0)
+  feedConsumed Float @default(0)
   health HealthRecord[]
   eggs EggProduction[]
   expenses Expense[]

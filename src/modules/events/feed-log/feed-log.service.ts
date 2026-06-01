@@ -56,6 +56,15 @@ class FeedLogService {
         },
       });
 
+      await tx.flock.update({
+        where: { id: flockId },
+        data: {
+          feedConsumed: {
+            increment: feedData.quantityKg,
+          },
+        },
+      });
+
       return feedLog;
     });
   }
@@ -129,6 +138,15 @@ class FeedLogService {
             notes: "Feed log adjustment",
           },
         });
+
+        await tx.flock.update({
+          where: { id: flockId },
+          data: {
+            feedConsumed: {
+              increment: delta,
+            },
+          },
+        });
       }
 
       await tx.feedLog.update({
@@ -177,6 +195,15 @@ class FeedLogService {
           type: InventoryTransactionType.ADJUSTMENT,
           quantity: log.quantityKg,
           notes: "Reversal of deleted feed log",
+        },
+      });
+
+      await tx.flock.update({
+        where: { id: flockId },
+        data: {
+          feedConsumed: {
+            decrement: log.quantityKg,
+          },
         },
       });
 
