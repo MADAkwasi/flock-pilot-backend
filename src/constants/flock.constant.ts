@@ -12,6 +12,8 @@ export const flockListSelect = {
   flockType: true,
   currentCount: true,
   source: true,
+  eggsLaid: true,
+  feedConsumed: true,
   status: true,
   startDate: true,
 } as const;
